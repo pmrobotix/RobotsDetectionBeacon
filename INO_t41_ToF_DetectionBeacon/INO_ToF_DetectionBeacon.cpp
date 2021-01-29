@@ -20,9 +20,12 @@ void loop() {
         digitalWrite(LED_BUILTIN + 1, LOW);
     }
 
-    tof_loop();
+    //Write ToF sensors in Serial
+    tof_loop(1);
 
     ledPanels_loop();
+
+
 }
 
 void setup() {

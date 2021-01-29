@@ -7,6 +7,7 @@
 
 #include "TofSensors.h"
 
+
 //front:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
 //Back:Violet05-Jaune06-Orange26-Rouge27-Marron28-Noir29-Blanc30-Gris31-violet32
 int shutd_pin[18] = { 41, 40, 39, 38, 37, 36, 35, 34, 33, 05, 06, 26, 27, 28, 29, 30, 31, 32 };
@@ -17,6 +18,8 @@ int center[16] = { 251, 243, 235, 227, 219, 211, 203, 195, 187, 179, 171, 163, 1
 char buffer[20];
 SFEVL53L1X vl[NumOfSensors];
 VL53L1X_Result_t res[NumOfZonesPerSensor * NumOfSensors];
+
+//TODO remplacer tout cela par plusieurs copie de res sur les 5 dernières fois
 int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
 int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
@@ -33,7 +36,7 @@ volatile int shared_endloop1 = 0;
 volatile int shared_endloop2 = 0;
 elapsedMicros elapsedT_us = 0;
 
-void tof_loop() {
+void tof_loop(int debug) {
     long t_start = elapsedT_us;
     //TODO si l'un VL est deconnecté
     //TODO si Off/ON alors reinit
@@ -55,14 +58,28 @@ void tof_loop() {
     }
     long t_waitthreads = elapsedT_us;
 
-    //print debug time
-    Serial.println(" t_start=" + String(t_start) +" t_writeserial=" + String(t_writeserial- t_start) + " t_waitthreads=" + String(t_waitthreads - t_writeserial));
+    if (debug)
+    {
 
+
+        for (int n = 0; n < NumOfSensors; n++) {
+            memset(buffer, 0, strlen(buffer));
+            for (int z = 0; z < NumOfZonesPerSensor; z++) {
+                sprintf(buffer, "%04d ", distance_t[(NumOfZonesPerSensor * n) + z]);
+                Serial.print(buffer);
+            }
+        }
+        Serial.println();
+
+        //print debug time
+        Serial.println(" t_start=" + String(t_start) +" t_writeserial=" + String(t_writeserial- t_start) + " t_waitthreads=" + String(t_waitthreads - t_writeserial));
+    }
     elapsedT_us = 0;
     shared_endloop1 = 0;
     shared_endloop2 = 0;
 
     threads.yield();
+
 }
 
 int scani2c(TwoWire w) {

@@ -16,6 +16,9 @@
 #include <FastLED_NeoMatrix.h>
 #include <LEDMatrix.h>
 #include "TeensyThreads.h"
+#include "fonts.h"
+#include <Fonts/Picopixel.h>
+
 
 #define DISABLE_WHITE
 
@@ -23,8 +26,8 @@
 // Used by LEDMatrix
 #define MATRIX_TILE_WIDTH   4 // width of EACH NEOPIXEL MATRIX (not total display)
 #define MATRIX_TILE_HEIGHT  4 // height of each matrix
-#define MATRIX_TILE_H       2  // number of matrices arranged horizontally
-#define MATRIX_TILE_V       9  // number of matrices arranged vertically
+#define MATRIX_TILE_H       9  // number of matrices arranged horizontally
+#define MATRIX_TILE_V       2  // number of matrices arranged vertically
 
 // Used by NeoMatrix
 #define mw (MATRIX_TILE_WIDTH *  MATRIX_TILE_H)
@@ -36,7 +39,7 @@
 #define MATRIX_HEIGHT mh
 #define MATRIX_WIDTH mw
 
-#define BRIGHTNESS 2
+#define BRIGHTNESS 5
 
 #define PIN 8 //serial PIN for WS2812
 
@@ -81,12 +84,32 @@
 #define LED_WHITE_HIGH                  (LED_RED_HIGH    + LED_GREEN_HIGH    + LED_BLUE_HIGH)
 
 
+
+
+
+
+
 void ledPanels_loop();
 void ledPanels_setup();
 void ledPanels_setup2();
 
-void matrix_clear();
+void display_leds_thread();
+void add_display_dist();
 
+void matrix_clear();
+void display_panOrBounceBitmap (uint8_t bitmapSize);
+void fixdrawRGBBitmap(int16_t x, int16_t y, const uint16_t *bitmap, int16_t w, int16_t h);
+void display_rgbBitmap(uint8_t bmp_num, uint16_t bmx=0, uint16_t bmy=0, bool clearAndShow=1);
+void display_scrollRgbBitmap();
+void display_four_white();
+void display_text(String txt);
+
+void display_resolution();
+void display_CountInv(int fromNumber);
+void display_INVscrollText(String txt);
+void display_INVscrollTextWithBitmap(String txt, int bmp_num);
+void display_scrollText(String txt);
+void display_scrollText_old();
 void display_dist();
 void sprite_setup();
 void flag();
@@ -97,7 +120,15 @@ void display_boxes();
 void display_circles();
 void display_textes();
 
-void display_leds();
+void write_PMX(int x, int y, uint32_t color);
+
+uint16_t Color24toColor16(uint32_t color) ;
+uint32_t Wheel(byte WheelPos);
+uint8_t font_zoom(uint8_t zoom_type, uint8_t speed);
+void font_loop();
+
+
+
 
 
 #endif /* LEDPANELS_H_ */

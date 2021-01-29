@@ -18,9 +18,11 @@
 #define NumOfZonesPerSensor             (((TotalWidthOfSPADS - WidthOfSPADsPerZone) / NumOfSPADsShiftPerZone) + 1)
 #define NumOfSensors                    18
 
+
+
 int scani2c(TwoWire w);
 void tof_setup();
-void tof_loop();
+void tof_loop(int debug=0);
 void loopvl1();
 void loopvl2();
 
