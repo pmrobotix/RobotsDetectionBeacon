@@ -17,8 +17,7 @@
 #define NumOfSPADsToStartZone           1 //SENS normal:declage de 2; sens inversé du tableau centre :decalage de 1
 #define NumOfZonesPerSensor             (((TotalWidthOfSPADS - WidthOfSPADsPerZone) / NumOfSPADsShiftPerZone) + 1)
 #define NumOfSensors                    18
-
-
+#define NumOfCollisionSensors           4
 
 int scani2c(TwoWire w);
 void tof_setup();

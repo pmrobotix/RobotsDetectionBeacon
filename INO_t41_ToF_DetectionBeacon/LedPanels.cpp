@@ -37,6 +37,7 @@ int8_t matrix_loop = -1;
 
 extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
+extern int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
 
 void matrix_clear() {
     // FastLED.clear does not work properly with multiple matrices connected via parallel inputs
@@ -111,13 +112,13 @@ void display_leds_thread() {
         //display_panOrBounceBitmap(8);
 
         //display_text("PMX");
-
+/*
         display_CountInv(5);
         //threads.delay(2000);
         display_scrollRgbBitmap();
         //display_INVscrollText("Happy Birthday Christophe!");
         display_INVscrollTextWithBitmap("Happy Birthday Christophe!", 0);
-
+*/
         for (int tt = 0; tt < 10000; tt++) {
             matrix->clear();
             //display_rgbBitmap(0);
@@ -164,9 +165,14 @@ void add_display_dist() {
     matrix->startWrite();
     for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
         //map
-        //int maxval=max(distance_t[n], distance_t[n+1]);
-        int maxval = distance_t[n];
-        int led_dist = map(maxval, 30, 1500, 0, 7);
+        int val = -1;
+        int val2 = -1;
+        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
+        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
+        int maxval=max(val, val2);
+
+        //int maxval = distance_t[n];
+        int led_dist = map(maxval, 20, 900, 0, 7);
         if (led_dist < 0) led_dist = 0;
         if (led_dist > 7) led_dist = 7;
         int x_decal = (n / 2) + 2;
@@ -204,10 +210,9 @@ void add_display_dist() {
         int x_decal = (moy_x / 2) + 2;
         if (x_decal >= 36) x_decal = x_decal - 36;
 
-
-        if (led_dist > 2 ) write_PMX(x_decal, 0, LED_BLUE_MEDIUM);
-                else if (led_dist > 1 && led_dist <= 2) write_PMX(x_decal, 0, LED_PURPLE_HIGH);
-                else write_PMX(x_decal, 0, LED_RED_HIGH);
+        if (led_dist > 2) write_PMX(x_decal, 0, LED_BLUE_MEDIUM);
+        else if (led_dist > 1 && led_dist <= 2) write_PMX(x_decal, 0, LED_PURPLE_HIGH);
+        else write_PMX(x_decal, 0, LED_RED_HIGH);
 
         int x_opp = x_decal + 18;
         if (x_opp >= 36) x_opp = x_opp - 36;

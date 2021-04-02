@@ -9,24 +9,6 @@
 
 int ii = 0;
 
-void loop() {
-    ii++;
-    if (ii % 2) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        digitalWrite(LED_BUILTIN + 1, HIGH);
-    }
-    else {
-        digitalWrite(LED_BUILTIN, LOW);
-        digitalWrite(LED_BUILTIN + 1, LOW);
-    }
-
-    //Write ToF sensors in Serial
-    tof_loop(1);
-
-    ledPanels_loop();
-
-
-}
 
 void setup() {
     delay(3000);
@@ -50,3 +32,22 @@ void setup() {
     tof_setup();
 }
 
+
+void loop() {
+    ii++;
+    if (ii % 2) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        digitalWrite(LED_BUILTIN + 1, HIGH);
+    }
+    else {
+        digitalWrite(LED_BUILTIN, LOW);
+        digitalWrite(LED_BUILTIN + 1, LOW);
+    }
+
+    //Write ToF sensors in Serial
+    tof_loop(1);
+
+    ledPanels_loop();
+
+
+}

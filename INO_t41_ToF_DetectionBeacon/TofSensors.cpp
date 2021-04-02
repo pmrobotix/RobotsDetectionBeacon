@@ -7,16 +7,26 @@
 
 #include "TofSensors.h"
 
+//
+//old- front:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
+//old- Back:Violet05-Jaune06-Orange26-Rouge27-Marron28-Noir29-Blanc30-Gris31-violet32
+//old- int shutd_pin[18] = { 41, 40, 39, 38, 37, 36, 35, 34, 33,  05, 06, 26, 27, 28, 29, 30, 31, 32 };
 
-//front:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
-//Back:Violet05-Jaune06-Orange26-Rouge27-Marron28-Noir29-Blanc30-Gris31-violet32
-int shutd_pin[18] = { 41, 40, 39, 38, 37, 36, 35, 34, 33, 05, 06, 26, 27, 28, 29, 30, 31, 32 };
+//Nouvelle config avec detecteurs
+// front[9] back[9]
+//front[8]:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
+//Back[8]:Violet20-Jaune21-Orange22-Rouge23-Marron4-Noir3-Blanc2-Gris1-violet0
+int shutd_pin[NumOfSensors] = { 20, 21, 22, 23, 4, 3, 2, 1, 0,  05, 06, 26, 27, 28, 29, 30, 31, 32};
 
-//centre d'après le tableau (inversé de gauche vers la droite à cause du sens des VL)
+//front[4] back[4]
+int shutd_pin_collision[NumOfCollisionSensors+NumOfCollisionSensors]= { 40, 39, 38, 37,  36, 35, 34, 33 };
+
+//centre des SPADs d'après le tableau (inversé de gauche vers la droite à cause du sens des VL)
 int center[16] = { 251, 243, 235, 227, 219, 211, 203, 195, 187, 179, 171, 163, 155, 147, 139, 131 };
 
-char buffer[20];
+char buffer[24];
 SFEVL53L1X vl[NumOfSensors];
+SFEVL53L1X vl_collision[NumOfCollisionSensors+NumOfCollisionSensors];
 VL53L1X_Result_t res[NumOfZonesPerSensor * NumOfSensors];
 
 //TODO remplacer tout cela par plusieurs copie de res sur les 5 dernières fois
@@ -35,6 +45,132 @@ int16_t OffsetCalxTalk[NumOfZonesPerSensor * 9] = { 0, 85, 31, 117, 0, 85, 31, 1
 volatile int shared_endloop1 = 0;
 volatile int shared_endloop2 = 0;
 elapsedMicros elapsedT_us = 0;
+
+
+
+void tof_setup() {
+
+    //Front vl on i2c 18 SDA / 19 SCL
+    for (int i = 0; i < NumOfSensors / 2; i++) {
+        vl[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
+    }
+    //Back vl on i2c  17 SDA1 / 16 SCL1
+    for (int i = NumOfSensors / 2; i < NumOfSensors; i++) {
+        vl[i] = SFEVL53L1X(Wire1, shutd_pin[i], -1);
+    }
+
+
+    //config collision Front vl on i2c 18 SDA / 19 SCL
+    for (int i = 0; i < (NumOfCollisionSensors); i++) {
+        vl_collision[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
+    }
+    //config collision Back vl on i2c  17 SDA1 / 16 SCL1
+    for (int i = 0; i < (NumOfCollisionSensors); i++) {
+        vl_collision[i] = SFEVL53L1X(Wire1, shutd_pin[i], -1);
+    }
+
+    //Config all shutpin
+    for (int i = 0; i < NumOfSensors; i++) {
+        pinMode(shutd_pin[i], OUTPUT);
+    }
+    for (int i = 0; i < NumOfCollisionSensors; i++) {
+        pinMode(shutd_pin_collision[i], OUTPUT);
+    }
+    //deactivate all
+    for (int i = 0; i < NumOfSensors; i++) {
+        digitalWrite(shutd_pin[i], LOW);
+    }
+    for (int i = 0; i < NumOfCollisionSensors; i++) {
+        digitalWrite(shutd_pin_collision[i], LOW);
+    }
+
+    Serial.println("vl I2C Change address ...");
+
+    for (int i = 0; i < NumOfSensors; i++) {
+        pinMode(shutd_pin[i], INPUT);
+        delay(10);
+        if (vl[i].begin() == 0) {
+            vl[i].setI2CAddress((uint8_t) ((0x15 + i) << 1));  //(DEC=21 22 23 ...) //address on 7bits<<1
+            digitalWrite(shutd_pin[i], HIGH);
+        }
+        else {
+            Serial.println("ERROR vl[" + String(i) + "] OFFLINE! ");
+            //while (1);
+        }
+    }
+
+    Serial.println("vl collision I2C Change address ...");
+    for (int i = 0; i < NumOfCollisionSensors; i++) {
+        pinMode(shutd_pin_collision[i], INPUT);
+        delay(10);
+        if (vl_collision[i].begin() == 0) {
+            vl_collision[i].setI2CAddress((uint8_t) ((0x15 + i) << 1));  //(DEC=21 22 23 ...) //address on 7bits<<1
+            digitalWrite(shutd_pin_collision[i], HIGH);
+        }
+        else {
+            Serial.println("ERROR vl_collision[" + String(i) + "] OFFLINE! ");
+            //while (1);
+        }
+    }
+
+    int front = scani2c(Wire);
+
+    //Error missing VL
+    if (front != 9) {
+        int iii = 0;
+        while (1) {
+            iii++;
+            if (iii % 2) {
+                //digitalWrite(LED_BUILTIN, HIGH);
+                digitalWrite(LED_BUILTIN + 1, HIGH);
+            }
+            else {
+                //digitalWrite(LED_BUILTIN, LOW);
+                digitalWrite(LED_BUILTIN + 1, LOW);
+            }
+            delay(200);
+        }
+    }
+    int back = scani2c(Wire1);
+    if (back != 9) {
+        int iii = 0;
+        while (1) {
+            iii++;
+            if (iii % 2) {
+                //digitalWrite(LED_BUILTIN, HIGH);
+                digitalWrite(LED_BUILTIN + 1, HIGH);
+            }
+            else {
+                //digitalWrite(LED_BUILTIN, LOW);
+                digitalWrite(LED_BUILTIN + 1, LOW);
+            }
+            delay(400);
+        }
+    }
+    Serial.println("Configuration de chaque VL... starting");
+    //configuration de chaque VL
+    for (int n = 0; n < NumOfSensors; n++) {
+        int addr = vl[n].getI2CAddress() >> 1;
+        Serial.print(" 0x");
+        Serial.print(addr, HEX);
+
+        uint16_t sensorId = vl[n].getSensorID();
+        Serial.print(" sensorId=");
+        Serial.print(sensorId, HEX);
+
+        int available = vl[n].checkID();
+        Serial.print(" up=");
+        Serial.println(available);
+
+        vl[n].setDistanceModeShort();
+        //vl[n].setDistanceModeLong();
+        vl[n].setTimingBudgetInMs(50);
+        vl[n].setIntermeasurementPeriod(51); // measure periodically. Intermeasurement period must be >/= timing budget.
+    }
+
+    threads.addThread(loopvl1);
+    threads.addThread(loopvl2);
+}
 
 void tof_loop(int debug) {
     long t_start = elapsedT_us;
@@ -58,9 +194,7 @@ void tof_loop(int debug) {
     }
     long t_waitthreads = elapsedT_us;
 
-    if (debug)
-    {
-
+    if (debug) {
 
         for (int n = 0; n < NumOfSensors; n++) {
             memset(buffer, 0, strlen(buffer));
@@ -71,8 +205,19 @@ void tof_loop(int debug) {
         }
         Serial.println();
 
+        for (int n = 0; n < NumOfSensors; n++) {
+            memset(buffer, 0, strlen(buffer));
+            for (int z = 0; z < NumOfZonesPerSensor; z++) {
+                sprintf(buffer, "%01d  ", status_t[(NumOfZonesPerSensor * n) + z]);
+                Serial.print(buffer);
+            }
+        }
+        Serial.println();
+
         //print debug time
-        Serial.println(" t_start=" + String(t_start) +" t_writeserial=" + String(t_writeserial- t_start) + " t_waitthreads=" + String(t_waitthreads - t_writeserial));
+        Serial.println(
+                " t_start=" + String(t_start) + " t_writeserial=" + String(t_writeserial - t_start) + " t_waitthreads="
+                        + String(t_waitthreads - t_writeserial));
     }
     elapsedT_us = 0;
     shared_endloop1 = 0;
@@ -211,95 +356,4 @@ void loopvl2() {
     }
 }
 
-
-void tof_setup() {
-
-    for (int i = 0; i < NumOfSensors / 2; i++) {
-        vl[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
-    }
-    for (int i = NumOfSensors / 2; i < NumOfSensors; i++) {
-        vl[i] = SFEVL53L1X(Wire1, shutd_pin[i], -1);
-    }
-
-    for (int i = 0; i < NumOfSensors; i++) {
-        pinMode(shutd_pin[i], OUTPUT);
-    }
-    //deactivate all
-    for (int i = 0; i < NumOfSensors; i++) {
-        digitalWrite(shutd_pin[i], LOW);
-    }
-
-    Serial.println("I2C Change address ...");
-
-    for (int i = 0; i < NumOfSensors; i++) {
-        pinMode(shutd_pin[i], INPUT);
-        delay(10);
-        if (vl[i].begin() == 0) {
-            vl[i].setI2CAddress((uint8_t) ((0x15 + i) << 1));  //(DEC=21 22 23 ...) //address on 7bits<<1
-            digitalWrite(shutd_pin[i], HIGH);
-        }
-        else {
-            Serial.println("ERROR vl[" + String(i) + "] OFFLINE! ");
-            //while (1);
-        }
-    }
-
-    int front = scani2c(Wire);
-
-    //Error missing VL
-    if (front != 9) {
-        int iii = 0;
-        while (1) {
-            iii++;
-            if (iii % 2) {
-                //digitalWrite(LED_BUILTIN, HIGH);
-                digitalWrite(LED_BUILTIN + 1, HIGH);
-            }
-            else {
-                //digitalWrite(LED_BUILTIN, LOW);
-                digitalWrite(LED_BUILTIN + 1, LOW);
-            }
-            delay(200);
-        }
-    }
-    int back = scani2c(Wire1);
-    if (back != 9) {
-        int iii = 0;
-        while (1) {
-            iii++;
-            if (iii % 2) {
-                //digitalWrite(LED_BUILTIN, HIGH);
-                digitalWrite(LED_BUILTIN + 1, HIGH);
-            }
-            else {
-                //digitalWrite(LED_BUILTIN, LOW);
-                digitalWrite(LED_BUILTIN + 1, LOW);
-            }
-            delay(400);
-        }
-    }
-    Serial.println("Configuration de chaque VL... starting");
-    //configuration de chaque VL
-    for (int n = 0; n < NumOfSensors; n++) {
-        int addr = vl[n].getI2CAddress() >> 1;
-        Serial.print(" 0x");
-        Serial.print(addr, HEX);
-
-        uint16_t sensorId = vl[n].getSensorID();
-        Serial.print(" sensorId=");
-        Serial.print(sensorId, HEX);
-
-        int available = vl[n].checkID();
-        Serial.print(" up=");
-        Serial.println(available);
-
-        vl[n].setDistanceModeShort();
-        //vl[n].setDistanceModeLong();
-        vl[n].setTimingBudgetInMs(50);
-        vl[n].setIntermeasurementPeriod(51); // measure periodically. Intermeasurement period must be >/= timing budget.
-    }
-
-    threads.addThread(loopvl1);
-    threads.addThread(loopvl2);
-}
 
