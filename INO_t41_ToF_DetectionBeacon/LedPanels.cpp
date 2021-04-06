@@ -5,12 +5,21 @@
  *      Author: cho (PM-ROBOTIX)
  */
 
+#include "INO_ToF_DetectionBeacon.h"
 #include "LedPanels.h"
-#include "TofSensors.h"
+#include <Wire.h>
+
+extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
+extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
+extern int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
+extern bool connected_t[NumOfZonesPerSensor * NumOfSensors];
+
+extern bool wait_TofVLReady;
+
 
 // cLEDMatrix defines
-cLEDMatrix<-MATRIX_TILE_WIDTH, -MATRIX_TILE_HEIGHT, HORIZONTAL_ZIGZAG_MATRIX,
-MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_ZIGZAG_BLOCKS> ledmatrix;
+cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX,
+    MATRIX_TILE_H, MATRIX_TILE_V, VERTICAL_BLOCKS> ledmatrix;
 
 // Normally we would define this:
 //CRGB leds[NUMMATRIX];
@@ -20,24 +29,16 @@ MATRIX_TILE_H, MATRIX_TILE_V, HORIZONTAL_ZIGZAG_BLOCKS> ledmatrix;
 // for NeoMatrix and other operations that may work directly on the array like FadeAll.
 CRGB *leds = ledmatrix[0];
 
-//FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
-//MATRIX_TILE_H, MATRIX_TILE_V,
-//NEO_MATRIX_TOP + NEO_MATRIX_LEFT +
-//NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG +
-//NEO_TILE_TOP + NEO_TILE_LEFT + NEO_TILE_ROWS + NEO_TILE_PROGRESSIVE);
-
 FastLED_NeoMatrix *matrix = new FastLED_NeoMatrix(leds, MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT,
 MATRIX_TILE_H, MATRIX_TILE_V,
 NEO_MATRIX_BOTTOM + NEO_MATRIX_LEFT +
 NEO_MATRIX_COLUMNS + NEO_MATRIX_ZIGZAG +
 NEO_TILE_BOTTOM + NEO_TILE_LEFT + NEO_TILE_COLUMNS + NEO_TILE_PROGRESSIVE);
 
+
 bool matrix_reset_demo = 1;
 int8_t matrix_loop = -1;
 
-extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
-extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
-extern int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
 
 void matrix_clear() {
     // FastLED.clear does not work properly with multiple matrices connected via parallel inputs
@@ -45,15 +46,54 @@ void matrix_clear() {
     memset(leds, 0, NUMMATRIX * 3);
 }
 
-void ledPanels_loop() {
+//Attention pas de delay dans cette fonction pour ne pas ralentir la main loop
+void ledPanels_loop(int debug) {
 
+
+//    if(debug)
+//    {
+//        //print
+//
+//    }
     threads.yield();
+}
+
+void showFirstLed()
+{
+    //FastLed ligne
+    matrix_clear();
+    ledmatrix.DrawLine(0, 0, 3 , 7 , CRGB(0, 255, 0));
+    ledmatrix.DrawLine(0, 0, ledmatrix.Width()-1 , ledmatrix.Height()-1 , CRGB(0, 0, 255));
+    ledmatrix.DrawLine(0, 0, 7 , 7 , CRGB(255, 0, 0));
+    FastLED.show();
+}
+
+void display_connected_vl() {
+    matrix->clear();
+    for (int n = 0; n < NumOfSensors; n++) {
+        for (int z = 0; z < NumOfZonesPerSensor; z++) {
+
+            int index_led = (int)( ((NumOfZonesPerSensor * n) + z) / 2.0);
+
+            if(connected_t[(NumOfZonesPerSensor * n) + z])
+            {
+                matrix->writePixel( index_led , 0 , LED_GREEN_MEDIUM);
+            }else
+            {
+                matrix->writePixel( index_led , 0 , LED_RED_MEDIUM);
+            }
+    //                Serial.print(filteredResult[(NumOfZonesPerSensor * n) + z]);
+    //                Serial.print(",");
+            matrix->show();
+            threads.delay(5);
+        }
+    }
 
 }
 
 void ledPanels_setup() {
 
-    // Normal output
+    // Normal output, no parallel configuration
     FastLED.addLeds<WS2812SERIAL, PIN, BRG>(leds, NUMMATRIX).setCorrection(TypicalLEDStrip);
 
     // Time for serial port to work?
@@ -61,7 +101,7 @@ void ledPanels_setup() {
     //Serial.begin(115200);
     Serial.print("Matrix Size: ");
     Serial.print(mw);
-    Serial.print(" ");
+    Serial.print(" * ");
     Serial.println(mh);
     matrix->begin();
     matrix->setTextWrap(false);
@@ -69,7 +109,7 @@ void ledPanels_setup() {
     // Mix in an init of LEDMatrix
     //sprite_setup();
     display_rgbBitmap(1);
-    delay(1000);
+    threads.delay(500);
 
     ledPanels_setup2();
 }
@@ -83,18 +123,36 @@ void ledPanels_setup2() {
     matrix->fillScreen(LED_WHITE_HIGH);
     matrix->show();
     Serial.println("First matrix->show did not crash/hang, trying clear");
-    delay(3000);
+    threads.delay(3000);
     matrix_clear();
     Serial.println("First matrix_clear done");
 #endif
 
-    matrix_clear();
-    matrix->show();
+    showFirstLed();
+    threads.delay(1000);
 
     threads.addThread(display_leds_thread);
 }
 
+
 void display_leds_thread() {
+
+    Serial.println("display_leds_thread starting...");
+    //wait for config VL
+    while(!wait_TofVLReady)
+    {
+
+        display_panOrBounceBitmap(8);
+
+        //threads.delay(500);
+        threads.yield();
+    }
+    matrix->clear();
+
+    //affichage de la bonne configuration des VL
+    display_connected_vl();
+    threads.delay(1000);
+
     int t = 0;
     while (1) {
         //TEST LEDS
@@ -109,8 +167,10 @@ void display_leds_thread() {
         //display_boxes();
         //display_scrollText();
 
-        //display_panOrBounceBitmap(8);
-
+//        display_panOrBounceBitmap(8);
+//        threads.delay(2000);
+//        display_resolution();
+//        threads.delay(2000);
         //display_text("PMX");
 /*
         display_CountInv(5);
@@ -119,14 +179,14 @@ void display_leds_thread() {
         //display_INVscrollText("Happy Birthday Christophe!");
         display_INVscrollTextWithBitmap("Happy Birthday Christophe!", 0);
 */
-        for (int tt = 0; tt < 10000; tt++) {
+        //for (int tt = 0; tt < 10000; tt++) {
             matrix->clear();
             //display_rgbBitmap(0);
             add_display_dist();
             matrix->show();
-            threads.yield();
-            threads.delay(1);
-        }
+//            threads.yield();
+//            threads.delay(1);
+//        }
 
         //display_scrollText_old();
         //threads.delay(2000);
@@ -138,7 +198,7 @@ void display_leds_thread() {
         //display_text("PMX");
         //font_loop();
         //threads.delay(2000);
-        Serial.println(t);
+//        Serial.println(t);
 
         /*
          Serial.println("Use LEDMatrix to display a flag");
@@ -156,13 +216,15 @@ void display_leds_thread() {
          display_circles();
          delay(3000);*/
         threads.yield();
-        //threads.delay(1);
+
+        //threads.delay(10);
     }
 }
 
 void add_display_dist() {
 
     matrix->startWrite();
+
     for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
         //map
         int val = -1;
@@ -172,12 +234,13 @@ void add_display_dist() {
         int maxval=max(val, val2);
 
         //int maxval = distance_t[n];
-        int led_dist = map(maxval, 20, 900, 0, 7);
+        int led_dist = map(maxval, 100, 1000, 0, 7);
         if (led_dist < 0) led_dist = 0;
         if (led_dist > 7) led_dist = 7;
         int x_decal = (n / 2) + 2;
         if (x_decal >= 36) x_decal = x_decal - 36;
-        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_LOW);
+        if(maxval > 100 && maxval < 1000)
+        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_MEDIUM);
     }
 
     int moyval = 0;
@@ -201,6 +264,7 @@ void add_display_dist() {
 
         }
     }
+
     if (nb > 0) {
         moyval = 1.0 * moyval / nb;
         moy_x = 1.0 * moy_x / nb;
@@ -210,7 +274,7 @@ void add_display_dist() {
         int x_decal = (moy_x / 2) + 2;
         if (x_decal >= 36) x_decal = x_decal - 36;
 
-        if (led_dist > 2) write_PMX(x_decal, 0, LED_BLUE_MEDIUM);
+        if (led_dist > 2) write_PMX(x_decal, 0, LED_BLUE_HIGH);
         else if (led_dist > 1 && led_dist <= 2) write_PMX(x_decal, 0, LED_PURPLE_HIGH);
         else write_PMX(x_decal, 0, LED_RED_HIGH);
 
@@ -218,8 +282,26 @@ void add_display_dist() {
         if (x_opp >= 36) x_opp = x_opp - 36;
         //matrix->writePixel(x_opp, 7-led_dist, LED_RED_HIGH);
 
+
         if (led_dist < 1) write_PMX(x_opp, 0, LED_RED_HIGH);
-        else matrix->writePixel(x_opp, 7 - led_dist, LED_RED_HIGH);
+        else
+        {
+
+            //affichage distance
+            //seuillage à 1cm pres
+            int moyval10cm = moyval/100.0;
+
+            matrix->setTextSize(1);
+            matrix->setFont();
+            matrix->setRotation(0);
+            matrix->setTextWrap(false);
+            matrix->setTextColor(matrix->Color(255, 100, 0));
+            matrix->setCursor(x_opp - 2, 0);
+            matrix->print(moyval10cm);
+
+            //affichage du pixel
+            matrix->writePixel(x_opp, 7 - led_dist, LED_RED_HIGH);
+        }
 
     }
     matrix->endWrite();

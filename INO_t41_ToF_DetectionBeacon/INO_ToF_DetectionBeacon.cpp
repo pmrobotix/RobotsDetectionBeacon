@@ -7,6 +7,21 @@
 
 #include "INO_ToF_DetectionBeacon.h"
 
+
+
+//Variables globales
+bool wait_TofVLReady = false;
+
+int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
+int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
+int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
+bool connected_t[NumOfZonesPerSensor * NumOfSensors];
+
+int16_t filteredResult_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+int16_t distance_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+int16_t status_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+bool connected_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+
 int ii = 0;
 
 
@@ -45,9 +60,7 @@ void loop() {
     }
 
     //Write ToF sensors in Serial
-    tof_loop(1);
+    tof_loop(true);
 
-    ledPanels_loop();
-
-
+    ledPanels_loop(false);
 }

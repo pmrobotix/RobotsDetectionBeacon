@@ -39,7 +39,7 @@
 #define MATRIX_HEIGHT mh
 #define MATRIX_WIDTH mw
 
-#define BRIGHTNESS 5
+#define BRIGHTNESS 20
 
 #define PIN 8 //serial PIN for WS2812
 
@@ -89,7 +89,7 @@
 
 
 
-void ledPanels_loop();
+void ledPanels_loop(int debug = 0);
 void ledPanels_setup();
 void ledPanels_setup2();
 

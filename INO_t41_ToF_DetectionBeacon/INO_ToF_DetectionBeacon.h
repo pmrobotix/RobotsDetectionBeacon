@@ -8,9 +8,19 @@
 #ifndef _INO_ToF_DetectionBeacon_H_
 #define _INO_ToF_DetectionBeacon_H_
 #include "Arduino.h"
+#include <Wire.h>
 #include "LedPanels.h"
 #include "TofSensors.h"
-#include <Wire.h>
+
+//CONFIG TOF VL53
+#define TotalWidthOfSPADS               16
+#define WidthOfSPADsPerZone             4
+#define NumOfSPADsShiftPerZone          4 //decalage de zone
+#define NumOfSPADsToStartZone           1 //SENS normal:declage de 2; sens inversé du tableau centre :decalage de 1
+#define NumOfZonesPerSensor             (((TotalWidthOfSPADS - WidthOfSPADsPerZone) / NumOfSPADsShiftPerZone) + 1)
+#define NumOfSensors                    18
+#define NumOfCollisionSensors           4
+
 
 
 #endif /* _INO_ToF_DetectionBeacon_H_ */
