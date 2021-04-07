@@ -13,6 +13,8 @@ extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
 extern bool connected_t[NumOfZonesPerSensor * NumOfSensors];
+extern int16_t SigPerSPAD_t[NumOfZonesPerSensor * NumOfSensors];
+
 extern bool connected_coll[NumOfCollisionSensors + NumOfCollisionSensors];
 
 extern bool wait_TofVLReady;
@@ -292,6 +294,24 @@ void add_display_dist() {
 //        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_MEDIUM);
 //    }
 
+    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
+        //map
+        int val = -1;
+        int val2 = -1;
+        if ((status_t[n] == 0 || status_t[n] ==2)&& SigPerSPAD_t[n] >1000) val = distance_t[n];
+        if ((status_t[n + 1] == 0 || status_t[n+1] ==2)&& SigPerSPAD_t[n + 1] >1000) val2 = distance_t[n + 1];
+        int maxval=max(val, val2);
+
+        //int maxval = distance_t[n];
+        int led_dist = map(maxval, 100, 1000, 0, 7);
+        if (led_dist < 0) led_dist = 0;
+        if (led_dist > 7) led_dist = 7;
+        int x_decal = (n / 2) + 2;
+        if (x_decal >= 36) x_decal = x_decal - 36;
+        if(maxval > 100 && maxval < 1000)
+        matrix->writePixel(x_decal, led_dist, LED_GREEN_MEDIUM);
+    }
+
     //Affichage PMX + Distance
     int moyval = 0;
     int moy_x = 0;
@@ -303,15 +323,25 @@ void add_display_dist() {
             //int val=max(filteredResult[n],filteredResult[n+1]);//max
             nb++;
             moyval += filteredResult[n];
-            moy_x += n; //todo attenation au 0 ?
+            moy_x += n;
 
         }
-        if (filteredResult[n + 1] != -1) {
-            //int val=max(filteredResult[n],filteredResult[n+1]);//max
-            nb++;
-            moyval += filteredResult[n + 1];
-            moy_x += n + 1; //todo attenation au 0 ?
+        if(n==(NumOfZonesPerSensor * NumOfSensors-1))
+        {
+            if (filteredResult[0] != -1) {
+                //int val=max(filteredResult[n],filteredResult[n+1]);//max
+                nb++;
+                moyval += filteredResult[0];
+                //moy_x += 0;
 
+            }
+        }else{
+            if (filteredResult[n + 1] != -1) {
+                //int val=max(filteredResult[n],filteredResult[n+1]);//max
+                nb++;
+                moyval += filteredResult[n + 1];
+                moy_x += n + 1;
+            }
         }
     }
 
@@ -352,6 +382,33 @@ void add_display_dist() {
         }
 
     }
+
+//    //test affichage du filtered
+//    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
+//        //map
+//        int val = filteredResult[n];
+//        int val2 = -1;
+//        if(n==NumOfZonesPerSensor * NumOfSensors -1)
+//            val2 = filteredResult[n+1];
+//        else
+//            val2 = filteredResult[0];
+//
+////        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
+////        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
+//        int maxval=max(val, val2);
+//
+//        //int maxval = distance_t[n];
+//        int led_dist = map(maxval, 20, 700, 0, 7);
+//        if (led_dist < 0) led_dist = 0;
+//        if (led_dist > 7) led_dist = 7;
+//        int x_decal = (n / 2) + 2;
+//        if (x_decal >= 36) x_decal = x_decal - 36;
+//        int x_opp = x_decal + 18;
+//        if (x_opp >= 36) x_opp = x_opp - 36;
+//        if(maxval > 100 && maxval < 1000)
+//            matrix->writePixel(x_opp, led_dist, LED_GREEN_MEDIUM);
+//    }
+
     matrix->endWrite();
 
 }
