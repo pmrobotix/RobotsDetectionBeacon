@@ -94,6 +94,7 @@ void ledPanels_setup();
 void ledPanels_setup2();
 
 void display_leds_thread();
+void add_display_debug();
 void add_display_dist();
 
 void matrix_clear();

@@ -12,6 +12,9 @@
 #include "LedPanels.h"
 #include "TofSensors.h"
 
+//Debug pour savoir a tout moment si un VL53 est out or not
+#define DEBUG_VL_SUR_LEDMATRIX           1
+
 //CONFIG TOF VL53
 #define TotalWidthOfSPADS               16
 #define WidthOfSPADsPerZone             4

@@ -69,7 +69,7 @@ void showFirstLed()
 }
 
 void display_connected_vl() {
-    matrix->clear();
+    //matrix->clear();
     for (int n = 0; n < NumOfSensors; n++) {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
 
@@ -77,15 +77,15 @@ void display_connected_vl() {
 
             if(connected_t[(NumOfZonesPerSensor * n) + z])
             {
-                matrix->writePixel( index_led , 0 , LED_GREEN_MEDIUM);
+                matrix->writePixel( index_led , 0 , LED_BLUE_MEDIUM);
             }else
             {
                 matrix->writePixel( index_led , 0 , LED_RED_MEDIUM);
             }
     //                Serial.print(filteredResult[(NumOfZonesPerSensor * n) + z]);
     //                Serial.print(",");
-            matrix->show();
-            threads.delay(5);
+            //matrix->show();
+            //threads.delay(5);
         }
     }
 
@@ -108,8 +108,8 @@ void ledPanels_setup() {
     matrix->setBrightness(BRIGHTNESS);
     // Mix in an init of LEDMatrix
     //sprite_setup();
-    display_rgbBitmap(1);
-    threads.delay(500);
+    //display_rgbBitmap(1);
+    //threads.delay(1500);
 
     ledPanels_setup2();
 }
@@ -150,13 +150,24 @@ void display_leds_thread() {
     matrix->clear();
 
     //affichage de la bonne configuration des VL
-    display_connected_vl();
-    threads.delay(1000);
+    //display_connected_vl();
+    //threads.delay(1000);
 
-    int t = 0;
+    //int t = 0;
     while (1) {
+
+        matrix->clear();
+#ifdef DEBUG_VL_SUR_LEDMATRIX
+        add_display_debug();
+#endif
+        add_display_dist();
+        matrix->show();
+
+        threads.yield();
+
+
         //TEST LEDS
-        t++;
+        //t++;
         //Serial.println("Count pixels");
         //count_pixels();
         //Serial.println("Count pixels done");
@@ -180,10 +191,11 @@ void display_leds_thread() {
         display_INVscrollTextWithBitmap("Happy Birthday Christophe!", 0);
 */
         //for (int tt = 0; tt < 10000; tt++) {
-            matrix->clear();
-            //display_rgbBitmap(0);
-            add_display_dist();
-            matrix->show();
+//            matrix->clear();
+//            //display_rgbBitmap(0);
+//
+//            add_display_dist();
+//            matrix->show();
 //            threads.yield();
 //            threads.delay(1);
 //        }
@@ -215,34 +227,53 @@ void display_leds_thread() {
 
          display_circles();
          delay(3000);*/
-        threads.yield();
+        //threads.yield();
 
         //threads.delay(10);
     }
 }
+void add_display_debug() {
 
+    for (int n = 0; n < NumOfSensors; n++) {
+        for (int z = 0; z < NumOfZonesPerSensor; z++) {
+
+            int index_led = (int) (((NumOfZonesPerSensor * n) + z) / 2.0);
+
+            if (connected_t[(NumOfZonesPerSensor * n) + z]) {
+                matrix->writePixel(index_led, 7, LED_BLUE_MEDIUM);
+            }
+            else {
+                matrix->writePixel(index_led, 7, LED_RED_MEDIUM);
+            }
+
+        }
+    }
+
+}
 void add_display_dist() {
 
     matrix->startWrite();
 
-    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
-        //map
-        int val = -1;
-        int val2 = -1;
-        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
-        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
-        int maxval=max(val, val2);
+    //GREEN display
+//    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
+//        //map
+//        int val = -1;
+//        int val2 = -1;
+//        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
+//        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
+//        int maxval=max(val, val2);
+//
+//        //int maxval = distance_t[n];
+//        int led_dist = map(maxval, 100, 1000, 0, 7);
+//        if (led_dist < 0) led_dist = 0;
+//        if (led_dist > 7) led_dist = 7;
+//        int x_decal = (n / 2) + 2;
+//        if (x_decal >= 36) x_decal = x_decal - 36;
+//        if(maxval > 100 && maxval < 1000)
+//        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_MEDIUM);
+//    }
 
-        //int maxval = distance_t[n];
-        int led_dist = map(maxval, 100, 1000, 0, 7);
-        if (led_dist < 0) led_dist = 0;
-        if (led_dist > 7) led_dist = 7;
-        int x_decal = (n / 2) + 2;
-        if (x_decal >= 36) x_decal = x_decal - 36;
-        if(maxval > 100 && maxval < 1000)
-        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_MEDIUM);
-    }
-
+    //Affichage PMX + Distance
     int moyval = 0;
     int moy_x = 0;
     int nb = 0;

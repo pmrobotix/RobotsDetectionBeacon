@@ -70,11 +70,11 @@ void tof_setup() {
 
     //config collision Front vl on i2c 18 SDA / 19 SCL
     for (int i = 0; i < (NumOfCollisionSensors); i++) {
-        vl_collision[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
+        vl_collision[i] = SFEVL53L1X(Wire, shutd_pin_collision[i], -1);
     }
     //config collision Back vl on i2c  17 SDA1 / 16 SCL1
     for (int i = NumOfCollisionSensors; i < (NumOfCollisionSensors + NumOfCollisionSensors); i++) {
-        vl_collision[i] = SFEVL53L1X(Wire1, shutd_pin[i], -1);
+        vl_collision[i] = SFEVL53L1X(Wire1, shutd_pin_collision[i], -1);
     }
 
     //Config all shutpin
@@ -110,8 +110,7 @@ void tof_setup() {
         if (vl[i].begin() == 0) {
             vl[i].setI2CAddress((uint8_t) ((0x15 + i) << 1));  //(DEC=21 22 23 ...) //address on 7bits<<1
             digitalWrite(shutd_pin[i], HIGH);
-            for (int z=0; z<NumOfZonesPerSensor;z++)
-            {
+            for (int z = 0; z < NumOfZonesPerSensor; z++) {
                 connected_t[(NumOfZonesPerSensor * i) + z] = true;
             }
         }
@@ -119,8 +118,7 @@ void tof_setup() {
             Serial.print("ERROR vl[" + String(i) + "] OFFLINE! ");
             Serial.print(" 0x");
             Serial.println((0x15 + i), HEX);
-            for (int z=0; z<NumOfZonesPerSensor;z++)
-            {
+            for (int z = 0; z < NumOfZonesPerSensor; z++) {
                 connected_t[(NumOfZonesPerSensor * i) + z] = false;
             }
             //while (1);
@@ -133,7 +131,7 @@ void tof_setup() {
         pinMode(shutd_pin_collision[i], INPUT);
         delay(10);
         if (vl_collision[i].begin() == 0) {
-            vl_collision[i].setI2CAddress((uint8_t) ((0x27 + i) << 1));  //(HEX=27 28 29 2A ...) //address on 7bits<<1
+            vl_collision[i].setI2CAddress((uint8_t) ((0x30 + i) << 1));  //(HEX=27 28 29 2A ...) //address on 7bits<<1
             digitalWrite(shutd_pin_collision[i], HIGH);
 
             connected_coll[i] = true;
@@ -142,7 +140,7 @@ void tof_setup() {
         else {
             Serial.print("ERROR vl_collision[" + String(i) + "] OFFLINE! ");
             Serial.print(" 0x");
-            Serial.println((0x27 + i), HEX);
+            Serial.println((0x30 + i), HEX);
 
             connected_coll[i] = false;
 
@@ -152,7 +150,6 @@ void tof_setup() {
 
     int front = scani2c(Wire);
     //Serial.println("scani2c front nb=" + String(front));
-
 
     int back = scani2c(Wire1);
     //Serial.println("scani2c back nb=" + String(back));
@@ -175,36 +172,35 @@ void tof_setup() {
     Serial.print("Config VL (FRONT):");
     //configuration de chaque VL
     for (int n = 0; n < NumOfSensors; n++) {
-        int available = vl[n].checkID();
-        if (available) {
-            //connected_t[n] = true;
-            int addr = vl[n].getI2CAddress() >> 1;
-            Serial.print(String(n) + "=0x");
-            Serial.print(addr, HEX);
-            Serial.print(" ");
-            //uint16_t sensorId = vl[n].getSensorID();
+        if (connected_t[n]) {
+            int available = vl[n].checkID();
+            if (available) {
+                //connected_t[n] = true;
+                int addr = vl[n].getI2CAddress() >> 1;
+                Serial.print(String(n) + "=0x");
+                Serial.print(addr, HEX);
+                Serial.print(" ");
+                //uint16_t sensorId = vl[n].getSensorID();
 
-
-            vl[n].setDistanceModeShort(); //Short to have relevant figures
-            vl[n].setTimingBudgetInMs(50); //50
-            vl[n].setIntermeasurementPeriod(51); //51 measure periodically. Intermeasurement period must be >/= timing budget.
-            if(n == 8)
-            {
-                Serial.println();
-                Serial.print("Config VL  (BACK):");
+                vl[n].setDistanceModeShort(); //Short to have relevant figures
+                vl[n].setTimingBudgetInMs(50); //50
+                vl[n].setIntermeasurementPeriod(51); //51 measure periodically. Intermeasurement period must be >/= timing budget.
+                if (n == 8) {
+                    Serial.println();
+                    Serial.print("Config VL  (BACK):");
+                }
             }
-        }
-        else {
-            Serial.print(String(n) + "=[0x");
-            Serial.print(vl[n].getI2CAddress() >> 1, HEX);
-            Serial.print(" ERROR");
-            Serial.print("] ");
+            else {
+                Serial.print(String(n) + "=[0x");
+                Serial.print(vl[n].getI2CAddress() >> 1, HEX);
+                Serial.print(" ERROR");
+                Serial.print("] ");
 
-            for (int z=0; z<NumOfZonesPerSensor;z++)
-            {
-                connected_t[(NumOfZonesPerSensor * n) + z] = false;
+                for (int z = 0; z < NumOfZonesPerSensor; z++) {
+                    connected_t[(NumOfZonesPerSensor * n) + z] = false;
+                }
+                status_t[n] = 8;
             }
-            status_t[n] = 8;
         }
     }
     Serial.println();
@@ -212,38 +208,38 @@ void tof_setup() {
     //Configuration de chaque VL COLLISION
     Serial.print("Config VL  (COLL):");
     for (int n = 0; n < (NumOfCollisionSensors + NumOfCollisionSensors); n++) {
-        int available = vl_collision[n].checkID();
-        if (available) {
-            //connected_coll[n] = true;
-            int addr = vl_collision[n].getI2CAddress() >> 1;
-            Serial.print(String(n) + "=0x");
-            Serial.print(addr, HEX);
-            Serial.print(" ");
-            //uint16_t sensorId = vl_collision[n].getSensorID();
+        if (connected_coll[n]) {
+            int available = vl_collision[n].checkID();
+            if (available) {
+                //connected_coll[n] = true;
+                int addr = vl_collision[n].getI2CAddress() >> 1;
+                Serial.print(String(n) + "=0x");
+                Serial.print(addr, HEX);
+                Serial.print(" ");
+                //uint16_t sensorId = vl_collision[n].getSensorID();
 
-            vl_collision[n].setDistanceModeShort(); //Short to have relevant figures
-            vl_collision[n].setTimingBudgetInMs(50); //50
-            vl_collision[n].setIntermeasurementPeriod(51); //51 measure periodically. Intermeasurement period must be >/= timing budget.
-            if(n == 8)
-                 Serial.println();
-        }
-        else {
-            Serial.print(String(n) + "=[0x");
-            Serial.print(vl_collision[n].getI2CAddress() >> 1, HEX);
-            Serial.print(" ERROR");
-            Serial.print("] ");
+                vl_collision[n].setDistanceModeShort(); //Short to have relevant figures
+                vl_collision[n].setTimingBudgetInMs(50); //50
+                vl_collision[n].setIntermeasurementPeriod(51); //51 measure periodically. Intermeasurement period must be >/= timing budget.
+                if (n == 8) Serial.println();
+            }
+            else {
+                Serial.print(String(n) + "= ");
+                //Serial.print(vl_collision[n].getI2CAddress() >> 1, HEX);
+                Serial.print(" ERROR");
+                Serial.print("] ");
 
+                connected_coll[n] = false;
 
-            connected_coll[n] = false;
-
-            status_coll[n] = 8;
+                status_coll[n] = 8;
+            }
         }
     }
     Serial.println();
 
     threads.delay(1000);
     wait_TofVLReady = true;
-    threads.delay(5000);
+    //threads.delay(5000);
 //exit(0);
     threads.addThread(loopvl1);
     threads.addThread(loopvl2);
@@ -255,6 +251,8 @@ void tof_loop(int debug) {
     //TODO si l'un VL est deconnecté
     //TODO si Off/ON alors reinit
     //TODO si perte de signal sur un des cables i2C
+    //TODO passage de la balise une partie en debut et à la fin
+    //TODO detecter 3 balises ?
 
     for (int n = 0; n < NumOfSensors; n++) {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
@@ -296,14 +294,14 @@ void tof_loop(int debug) {
         }
         Serial.println();
 
-        for (int n = 0; n < NumOfSensors; n++) {
-            memset(buffer, 0, strlen(buffer));
-            for (int z = 0; z < NumOfZonesPerSensor; z++) {
-                sprintf(buffer, "%01d  ", connected_t[(NumOfZonesPerSensor * n) + z]);
-                Serial.print(buffer);
-            }
-        }
-        Serial.println();
+//        for (int n = 0; n < NumOfSensors; n++) {
+//            memset(buffer, 0, strlen(buffer));
+//            for (int z = 0; z < NumOfZonesPerSensor; z++) {
+//                sprintf(buffer, "%01d  ", connected_t[(NumOfZonesPerSensor * n) + z]);
+//                Serial.print(buffer);
+//            }
+//        }
+//        Serial.println();
 
         //print debug time
         Serial.println(
@@ -352,18 +350,15 @@ void loopvl1() {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
 
             for (int n = 0; n < NumOfSensors / 2; n++) { //NumOfSensors
-                if(!vl[n].checkID())
-                    connected_t[(NumOfZonesPerSensor * n) + z] = false;
-                if(connected_t[(NumOfZonesPerSensor * n) + z])
-                {
+                if (!vl[n].checkID()) connected_t[(NumOfZonesPerSensor * n) + z] = false;
+                if (connected_t[(NumOfZonesPerSensor * n) + z]) {
                     vl[n].setROI(WidthOfSPADsPerZone, 8, center[NumOfSPADsShiftPerZone * z + NumOfSPADsToStartZone]);
                     vl[n].startRanging();
                 }
             }
 
             for (int n = 0; n < NumOfSensors / 2; n++) { //NumOfSensors
-                if(connected_t[(NumOfZonesPerSensor * n) + z])
-                {
+                if (connected_t[(NumOfZonesPerSensor * n) + z]) {
                     while (!vl[n].checkForDataReady()) {
                         //threads.delay(1); //195ms en tout
                         //delay(1); //180ms en tout
@@ -378,7 +373,8 @@ void loopvl1() {
 
                     //(3 - z) c'est pour inverser les capteurs et lire les zones dans l'autre sens
                     if ((res[(NumOfZonesPerSensor * n) + z].NumSPADs < 5
-                            && (res[(NumOfZonesPerSensor * n) + z].Status == RangeValid || res[(NumOfZonesPerSensor * n) + z].Status == PhaseOutOfLimit)
+                            && (res[(NumOfZonesPerSensor * n) + z].Status == RangeValid
+                                    || res[(NumOfZonesPerSensor * n) + z].Status == PhaseOutOfLimit)
                             && res[(NumOfZonesPerSensor * n) + z].SigPerSPAD > 600 && res[(NumOfZonesPerSensor * n) + z].Ambient < 1100)) //500 25000 si on se fait eblouir
                     {
 
@@ -394,8 +390,8 @@ void loopvl1() {
                     NumSPADs_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].NumSPADs;
                     SigPerSPAD_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].SigPerSPAD;
                     Ambient_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].Ambient;
-                }else
-                {
+                }
+                else {
                     filteredResult[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
                     distance_t[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
                     status_t[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
@@ -418,18 +414,15 @@ void loopvl2() {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
 
             for (int n = (NumOfSensors / 2); n < NumOfSensors; n++) { //NumOfSensors
-                if(!vl[n].checkID())
-                    connected_t[(NumOfZonesPerSensor * n) + z] = false;
-                if(connected_t[(NumOfZonesPerSensor * n) + z])
-                {
+                if (!vl[n].checkID()) connected_t[(NumOfZonesPerSensor * n) + z] = false;
+                if (connected_t[(NumOfZonesPerSensor * n) + z]) {
                     vl[n].setROI(WidthOfSPADsPerZone, 8, center[NumOfSPADsShiftPerZone * z + NumOfSPADsToStartZone]);
                     vl[n].startRanging();
                 }
             }
 
             for (int n = (NumOfSensors / 2); n < NumOfSensors; n++) { //NumOfSensors
-                if(connected_t[(NumOfZonesPerSensor * n) + z])
-                {
+                if (connected_t[(NumOfZonesPerSensor * n) + z]) {
                     while (!vl[n].checkForDataReady()) {
                         //threads.delay(1); //195ms en tout
                         //delay(1); //180ms en tout
@@ -444,7 +437,8 @@ void loopvl2() {
                     vl[n].stopRanging();
 
                     if ((res[(NumOfZonesPerSensor * n) + z].NumSPADs < 5
-                            && (res[(NumOfZonesPerSensor * n) + z].Status == RangeValid || res[(NumOfZonesPerSensor * n) + z].Status == PhaseOutOfLimit)
+                            && (res[(NumOfZonesPerSensor * n) + z].Status == RangeValid
+                                    || res[(NumOfZonesPerSensor * n) + z].Status == PhaseOutOfLimit)
                             && res[(NumOfZonesPerSensor * n) + z].SigPerSPAD > 600 && res[(NumOfZonesPerSensor * n) + z].Ambient < 1100)) //500 25000 si on se fait eblouir
                     {
 
@@ -460,8 +454,8 @@ void loopvl2() {
                     NumSPADs_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].NumSPADs;
                     SigPerSPAD_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].SigPerSPAD;
                     Ambient_t[(NumOfZonesPerSensor * n) + (3 - z)] = res[(NumOfZonesPerSensor * n) + z].Ambient;
-                }else
-                {
+                }
+                else {
                     filteredResult[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
                     distance_t[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
                     status_t[(NumOfZonesPerSensor * n) + (3 - z)] = -2;
