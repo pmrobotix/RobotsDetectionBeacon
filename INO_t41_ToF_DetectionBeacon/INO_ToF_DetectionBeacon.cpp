@@ -16,11 +16,17 @@ int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
 int16_t status_t[NumOfZonesPerSensor * NumOfSensors];
 bool connected_t[NumOfZonesPerSensor * NumOfSensors];
+int16_t NumSPADs_t[NumOfZonesPerSensor * NumOfSensors];
+int16_t SigPerSPAD_t[NumOfZonesPerSensor * NumOfSensors];
+int16_t Ambient_t[NumOfZonesPerSensor * NumOfSensors];
 
 int16_t filteredResult_coll[NumOfCollisionSensors + NumOfCollisionSensors];
 int16_t distance_coll[NumOfCollisionSensors + NumOfCollisionSensors];
 int16_t status_coll[NumOfCollisionSensors + NumOfCollisionSensors];
 bool connected_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+int16_t NumSPADs_coll[NumOfZonesPerSensor * NumOfSensors];
+int16_t SigPerSPAD_coll[NumOfZonesPerSensor * NumOfSensors];
+int16_t Ambient_coll[NumOfZonesPerSensor * NumOfSensors];
 
 int ii = 0;
 

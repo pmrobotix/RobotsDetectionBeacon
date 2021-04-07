@@ -19,9 +19,9 @@
 #include "fonts.h"
 #include <Fonts/Picopixel.h>
 
+#define BRIGHTNESS 20
 
 #define DISABLE_WHITE
-
 
 // Used by LEDMatrix
 #define MATRIX_TILE_WIDTH   4 // width of EACH NEOPIXEL MATRIX (not total display)
@@ -39,7 +39,7 @@
 #define MATRIX_HEIGHT mh
 #define MATRIX_WIDTH mw
 
-#define BRIGHTNESS 20
+
 
 #define PIN 8 //serial PIN for WS2812
 
