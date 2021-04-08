@@ -43,6 +43,9 @@ extern int16_t Ambient_coll[NumOfZonesPerSensor * NumOfSensors];
 //TODO remplacer tout cela par plusieurs copie de res sur les 5 dernières fois?
 
 extern bool wait_TofVLReady;
+extern int nb_active_filtered_sensors;
+extern int videoMode;
+
 extern bool connected_t[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];
@@ -249,6 +252,11 @@ void tof_setup() {
     threads.addThread(loopvl2);
 }
 
+void calculPosition(float decalage)
+{
+
+}
+
 //Attention pas de delay dans cette fonction pour ne pas ralentir la main loop
 void tof_loop(int debug) {
     long t_start = elapsedT_us;
@@ -258,9 +266,13 @@ void tof_loop(int debug) {
     //TODO passage de la balise une partie en debut et à la fin
     //TODO detecter 3 balises ?
 
+    nb_active_filtered_sensors = 0;
     for (int n = 0; n < NumOfSensors; n++) {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
-            Serial.print(filteredResult[(NumOfZonesPerSensor * n) + z]);
+            int val = filteredResult[(NumOfZonesPerSensor * n) + z];
+            if (val > 0)
+                nb_active_filtered_sensors++;
+            Serial.print(val);
             Serial.print(",");
         }
     }
@@ -270,8 +282,19 @@ void tof_loop(int debug) {
         Serial.print(",");
     }
     Serial.println();
-
     long t_writeserial = elapsedT_us;
+
+    //change mode
+    if (nb_active_filtered_sensors > NumOfSensorsForVideoMode)
+    {
+        videoMode = 1;
+    }
+
+    //Calcul des positions
+    float decalage_degre = 10.0;
+    calculPosition(decalage_degre);
+
+
 
     //synchronisation des 2 threads
     while (!shared_endloop1 || !shared_endloop2) {
@@ -279,6 +302,7 @@ void tof_loop(int debug) {
     }
     long t_waitthreads = elapsedT_us;
 
+    //print info debug
     if (debug) {
         for (int n = 0; n < NumOfSensors; n++) {
             memset(buffer, 0, strlen(buffer));

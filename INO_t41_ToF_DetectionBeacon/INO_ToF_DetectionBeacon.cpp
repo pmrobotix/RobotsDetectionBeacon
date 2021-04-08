@@ -28,6 +28,8 @@ int16_t NumSPADs_coll[NumOfZonesPerSensor * NumOfSensors];
 int16_t SigPerSPAD_coll[NumOfZonesPerSensor * NumOfSensors];
 int16_t Ambient_coll[NumOfZonesPerSensor * NumOfSensors];
 
+int nb_active_filtered_sensors;
+int videoMode;
 int ii = 0;
 
 
@@ -48,6 +50,8 @@ void setup() {
     pinMode(LED_BUILTIN + 2, OUTPUT); //optional
 
 
+    videoMode = 0;
+
     ledPanels_setup();
 
     tof_setup();
@@ -66,7 +70,7 @@ void loop() {
     }
 
     //Write ToF sensors in Serial
-    tof_loop(true);
+    tof_loop(false);
 
     ledPanels_loop(false);
 }

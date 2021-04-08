@@ -18,6 +18,7 @@ extern int16_t SigPerSPAD_t[NumOfZonesPerSensor * NumOfSensors];
 extern bool connected_coll[NumOfCollisionSensors + NumOfCollisionSensors];
 
 extern bool wait_TofVLReady;
+extern int videoMode;
 
 // cLEDMatrix defines
 cLEDMatrix<MATRIX_TILE_WIDTH, MATRIX_TILE_HEIGHT, VERTICAL_ZIGZAG_MATRIX,
@@ -150,16 +151,27 @@ void display_leds_thread() {
 
     //int t = 0;
     while (1) {
-
-        matrix->clear();
+        if (videoMode == 0)
+        {
+            matrix->clear();
 #ifdef DEBUG_VL_SUR_LEDMATRIX
-        add_display_debug();
+            add_display_debug();
 #endif
-        add_display_dist();
-        matrix->show();
+            add_display_dist();
+            matrix->show();
 
-        threads.yield();
-
+            threads.yield();
+        }
+        if (videoMode == 1)
+        {
+            matrix->clear();
+            display_scrollRgbBitmap();
+            //display_INVscrollText("Hello I'm PMX!");
+            display_INVscrollTextWithBitmap("Hello I'm PMX!", 0 , 40);
+            matrix->show();
+            //threads.delay(2000);
+            videoMode = 0;
+        }
         //TEST LEDS
         //t++;
         //Serial.println("Count pixels");
@@ -276,24 +288,6 @@ void add_display_dist() {
     matrix->startWrite();
 
     //GREEN display
-//    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
-//        //map
-//        int val = -1;
-//        int val2 = -1;
-//        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
-//        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
-//        int maxval=max(val, val2);
-//
-//        //int maxval = distance_t[n];
-//        int led_dist = map(maxval, 100, 1000, 0, 7);
-//        if (led_dist < 0) led_dist = 0;
-//        if (led_dist > 7) led_dist = 7;
-//        int x_decal = (n / 2) + 2;
-//        if (x_decal >= 36) x_decal = x_decal - 36;
-//        if(maxval > 100 && maxval < 1000)
-//        matrix->writePixel(x_decal, 7 - led_dist, LED_GREEN_MEDIUM);
-//    }
-
     for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
         //map
         int val = -1;
@@ -382,33 +376,35 @@ void add_display_dist() {
         }
 
     }
+    String tmp = "";
+    //test affichage du filtered
+    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
+        //map
+        int val = filteredResult[n];
+        int val2 = -1;
+        if(n<=NumOfZonesPerSensor * NumOfSensors -1)
+            val2 = filteredResult[n+1];
+        else
+            val2 = filteredResult[0];
 
-//    //test affichage du filtered
-//    for (int n = 0; n < NumOfZonesPerSensor * NumOfSensors; n = n + 2) {
-//        //map
-//        int val = filteredResult[n];
-//        int val2 = -1;
-//        if(n==NumOfZonesPerSensor * NumOfSensors -1)
-//            val2 = filteredResult[n+1];
-//        else
-//            val2 = filteredResult[0];
-//
-////        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
-////        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
-//        int maxval=max(val, val2);
-//
-//        //int maxval = distance_t[n];
+//        if (status_t[n] == 0 || status_t[n] == 2) val = distance_t[n];
+//        if (status_t[n + 1] == 0 || status_t[n + 1] == 2) val2 = distance_t[n + 1];
+        int maxval=max(val, val2);
+        tmp +=maxval + " ";
+
+        //int maxval = distance_t[n];
 //        int led_dist = map(maxval, 20, 700, 0, 7);
 //        if (led_dist < 0) led_dist = 0;
 //        if (led_dist > 7) led_dist = 7;
-//        int x_decal = (n / 2) + 2;
-//        if (x_decal >= 36) x_decal = x_decal - 36;
-//        int x_opp = x_decal + 18;
-//        if (x_opp >= 36) x_opp = x_opp - 36;
-//        if(maxval > 100 && maxval < 1000)
-//            matrix->writePixel(x_opp, led_dist, LED_GREEN_MEDIUM);
-//    }
-
+        int x_decal = (n / 2) + 2;
+        if (x_decal >= 36) x_decal = x_decal - 36;
+        int x_opp = x_decal + 18;
+        if (x_opp >= 36) x_opp = x_opp - 36;
+        //if(maxval > 100 && maxval < 1000)
+        if (maxval>0)
+            matrix->writePixel(x_opp, 7, LED_WHITE_MEDIUM);
+    }
+    //Serial.println(tmp);
     matrix->endWrite();
 
 }
@@ -800,7 +796,7 @@ void display_scrollRgbBitmap() {
         threads.delay(20);
     }
 }
-void display_INVscrollTextWithBitmap(String txt, int bitmap) {
+void display_INVscrollTextWithBitmap(String txt, int bitmap, int delay_ms) {
 
     matrix->setTextSize(1);
     matrix->setFont();
@@ -822,7 +818,7 @@ void display_INVscrollTextWithBitmap(String txt, int bitmap) {
         //add_display_dist();
 
         matrix->show();
-        threads.delay(75);
+        threads.delay(delay_ms);
     }
 
 //matrix->setRotation(0);
@@ -831,7 +827,7 @@ void display_INVscrollTextWithBitmap(String txt, int bitmap) {
 
 }
 
-void display_INVscrollText(String txt) {
+void display_INVscrollText(String txt, int delay_ms) {
     matrix->setTextSize(1);
     matrix->setFont();
     matrix->setRotation(0);

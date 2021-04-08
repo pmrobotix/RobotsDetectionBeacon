@@ -24,6 +24,6 @@
 #define NumOfSensors                    18
 #define NumOfCollisionSensors           4
 
-
+#define NumOfSensorsForVideoMode        26
 
 #endif /* _INO_ToF_DetectionBeacon_H_ */

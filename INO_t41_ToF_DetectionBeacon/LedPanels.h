@@ -107,8 +107,8 @@ void display_text(String txt);
 
 void display_resolution();
 void display_CountInv(int fromNumber);
-void display_INVscrollText(String txt);
-void display_INVscrollTextWithBitmap(String txt, int bmp_num);
+void display_INVscrollText(String txt, int delay_ms = 75);
+void display_INVscrollTextWithBitmap(String txt, int bmp_num, int delay_ms = 75);
 void display_scrollText(String txt);
 void display_scrollText_old();
 void display_dist();
