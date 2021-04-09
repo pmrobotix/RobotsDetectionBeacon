@@ -16,6 +16,9 @@ extern bool connected_t[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t SigPerSPAD_t[NumOfZonesPerSensor * NumOfSensors];
 
 extern bool connected_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+extern int16_t distance_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+extern int16_t status_coll[NumOfCollisionSensors + NumOfCollisionSensors];
+extern int16_t SigPerSPAD_coll[NumOfZonesPerSensor * NumOfSensors];
 
 extern bool wait_TofVLReady;
 extern int videoMode;
@@ -167,7 +170,7 @@ void display_leds_thread() {
             matrix->clear();
             display_scrollRgbBitmap();
             //display_INVscrollText("Hello I'm PMX!");
-            display_INVscrollTextWithBitmap("Hello I'm PMX!", 0 , 40);
+            display_INVscrollTextWithBitmap("Don't touch!", 0 , 30);
             matrix->show();
             //threads.delay(2000);
             videoMode = 0;
@@ -236,7 +239,7 @@ void display_leds_thread() {
     }
 }
 void add_display_debug() {
-
+/*
     //Debug BLEU/RED sur les detecteurs
     for (int n = 0; n < NumOfSensors; n++) {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
@@ -251,7 +254,7 @@ void add_display_debug() {
             }
 
         }
-    }
+    }*/
     int index_led =0;
     int c = 0;
     //Debug //BLEU/RED sur les detecteurs de collision
@@ -265,23 +268,28 @@ void add_display_debug() {
 //            matrix->writePixel(index_led, 6, LED_RED_MEDIUM);
 //        }
         //disposition en colonnes
-        if (n==0){index_led=24;c=5;}
-        if (n==1){index_led=24;c=4;}
-        if (n==2){index_led=27;c=5;}
-        if (n==3){index_led=27;c=4;}
-        if (n==4){index_led=24;c=1;}
-        if (n==5){index_led=24;c=2;}
-        if (n==6){index_led=27;c=1;}
-        if (n==7){index_led=27;c=2;}
+        if (n==0){index_led=28;c=3;}
+        if (n==1){index_led=29;c=3;}
+        if (n==2){index_led=30;c=3;}
+        if (n==3){index_led=31;c=3;}
+        if (n==4){index_led=28;c=7;}
+        if (n==5){index_led=29;c=7;}
+        if (n==6){index_led=30;c=7;}
+        if (n==7){index_led=31;c=7;}
 
         if (connected_coll[n]) {
-            matrix->writePixel(index_led, c, LED_BLUE_MEDIUM);
+            int val = -1;
+            if((status_coll[n] == 0||status_coll[n] == 2)&& SigPerSPAD_coll[n])
+                val = distance_coll[n];
+
+            int l=map(val, 50, 400, 0, 3);
+            //matrix->writePixel(index_led, c, LED_BLUE_MEDIUM);
+            matrix->writePixel(index_led, c-l, LED_BLUE_MEDIUM);
         }
         else {
             matrix->writePixel(index_led, c, LED_RED_MEDIUM);
         }
     }
-
 }
 void add_display_dist() {
 
@@ -297,13 +305,16 @@ void add_display_dist() {
         int maxval=max(val, val2);
 
         //int maxval = distance_t[n];
-        int led_dist = map(maxval, 100, 1000, 0, 7);
+        int led_dist = map(maxval, 100, 900, 0, 7);
         if (led_dist < 0) led_dist = 0;
         if (led_dist > 7) led_dist = 7;
         int x_decal = (n / 2) + 2;
         if (x_decal >= 36) x_decal = x_decal - 36;
         if(maxval > 100 && maxval < 1000)
-        matrix->writePixel(x_decal, led_dist, LED_GREEN_MEDIUM);
+        {
+            matrix->writePixel(x_decal, led_dist, LED_GREEN_MEDIUM);
+            //matrix->writeLine(x_decal, 0, x_decal, led_dist, LED_GREEN_MEDIUM);
+        }
     }
 
     //Affichage PMX + Distance
