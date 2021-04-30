@@ -7,7 +7,8 @@
 
 #include "INO_ToF_DetectionBeacon.h"
 #include "LedPanels.h"
-#include <Wire.h>
+#include <i2c_driver_wire.h>//
+//#include <Wire.h>
 
 extern int16_t filteredResult[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t distance_t[NumOfZonesPerSensor * NumOfSensors];

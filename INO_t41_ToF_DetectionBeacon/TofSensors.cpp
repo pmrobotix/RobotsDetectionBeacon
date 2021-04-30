@@ -7,7 +7,7 @@
 
 #include "INO_ToF_DetectionBeacon.h"
 #include "TofSensors.h"
-
+#include <i2c_register_slave.h>
 //
 //old- front:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
 //old- Back:Violet05-Jaune06-Orange26-Rouge27-Marron28-Noir29-Blanc30-Gris31-violet32
@@ -19,7 +19,7 @@
 //Back[9]:Violet20-Jaune21-Orange22-Rouge23-Marron4-Noir3-Blanc2-Gris1-violet0
 int shutd_pin[NumOfSensors] = { 20, 21, 22, 23, 4, 3, 2, 1, 0, 5, 6, 26, 27, 28, 29, 30, 31, 32 };
 
-//front[4] back[4]
+//front[4]= BAS HAUT BAS HAUT  back[4]
 int shutd_pin_collision[NumOfCollisionSensors + NumOfCollisionSensors] = { 40, 39, 38, 37, 36, 35, 34, 33 };
 
 //centre des SPADs d'après le tableau (inversé de gauche vers la droite à cause du sens des VL)
@@ -54,6 +54,7 @@ extern int16_t NumSPADs_t[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t SigPerSPAD_t[NumOfZonesPerSensor * NumOfSensors];
 extern int16_t Ambient_t[NumOfZonesPerSensor * NumOfSensors];
 
+
 int16_t OffsetCal[NumOfZonesPerSensor * 9] = { 60, 110, 134, 95, 60, 110, 134, 95, 60, 110, 134, 95, 60, 110, 134, 95, 60, 110, 134, 95, 60, 110, 134,
         95, 60, 110, 134, 95, 60, 110, 134, 95, 60, 110, 134, 95 };
 int16_t OffsetCalxTalk[NumOfZonesPerSensor * 9] = { 0, 85, 31, 117, 0, 85, 31, 117, 0, 85, 31, 117, 0, 85, 31, 117, 0, 85, 31, 117, 0, 85, 31, 117, 0,
@@ -63,6 +64,8 @@ volatile int shared_endloop1 = 0;
 volatile int shared_endloop2 = 0;
 
 elapsedMicros elapsedT_us = 0;
+
+
 
 void tof_setup() {
 
@@ -155,11 +158,7 @@ void tof_setup() {
         }
     }
 
-    int front = scani2c(Wire);
-    //Serial.println("scani2c front nb=" + String(front));
 
-    int back = scani2c(Wire1);
-    //Serial.println("scani2c back nb=" + String(back));
 
 ////Error missing VL
 //        int iii = 0;
@@ -246,26 +245,35 @@ void tof_setup() {
 
     threads.delay(1000);
     wait_TofVLReady = true;
-    //threads.delay(5000);
-//exit(0);
+
     threads.addThread(loopvl1);
     threads.addThread(loopvl2);
 }
 
-void calculPosition(float decalage)
-{
 
-}
+
 
 //Attention pas de delay dans cette fonction pour ne pas ralentir la main loop
-void tof_loop(int debug) {
+void tof_loop(Registers &registers, int debug) {
     long t_start = elapsedT_us;
+
+
+
     //TODO si l'un VL est deconnecté
     //TODO si Off/ON alors reinit
     //TODO si perte de signal sur un des cables i2C
     //TODO passage de la balise une partie en debut et à la fin
     //TODO detecter 3 balises ?
 
+
+
+    //Write ToF sensors in Serial
+//    for (int n = 0; n < (NumOfCollisionSensors + NumOfCollisionSensors); n++) {
+//
+//        Serial.print(filteredResult_coll[n]);
+//        Serial.print(",");
+//    }
+//    Serial.println();
     nb_active_filtered_sensors = 0;
     for (int n = 0; n < NumOfSensors; n++) {
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
@@ -277,11 +285,8 @@ void tof_loop(int debug) {
         }
     }
     Serial.println();
-    for (int n = 0; n < (NumOfCollisionSensors + NumOfCollisionSensors); n++) {
-        Serial.print(filteredResult_coll[n]);
-        Serial.print(",");
-    }
     Serial.println();
+
     long t_writeserial = elapsedT_us;
 
     //change mode
@@ -290,17 +295,6 @@ void tof_loop(int debug) {
         videoMode = 1;
     }
 
-    //Calcul des positions
-    float decalage_degre = 10.0;
-    calculPosition(decalage_degre);
-
-
-
-    //synchronisation des 2 threads
-    while (!shared_endloop1 || !shared_endloop2) {
-        threads.yield();
-    }
-    long t_waitthreads = elapsedT_us;
 
     //print info debug
     if (debug) {
@@ -355,41 +349,33 @@ void tof_loop(int debug) {
 //        }
 //        Serial.println();
 
-        //print debug time
-        Serial.println(
-                " t_start=" + String(t_start) + " t_writeserial=" + String(t_writeserial - t_start) + " t_waitthreads="
-                        + String(t_waitthreads - t_writeserial));
+
     }
+    long t_printDebug = elapsedT_us;
+
+
+    //synchronisation des 2 threads de VL
+    while (!shared_endloop1 || !shared_endloop2) {
+        threads.yield();
+    }
+    long t_waitthreads = elapsedT_us;
+
+    //print debug time
+    Serial.println(
+            " t_start=" + String(t_start)
+            + " t_writeserial=" + String(t_writeserial - t_start)
+            + " t_printDebug=" + String(t_printDebug - t_writeserial)
+            + " t_waitthreads=" + String(t_waitthreads - t_printDebug));
     Serial.println();
 
+
     elapsedT_us = 0;
-    shared_endloop1 = 0;
-    shared_endloop2 = 0;
+    shared_endloop1 = 0; //lancement de la mise à jour des données loop1
+    shared_endloop2 = 0; //lancement de la mise à jour des données loop2
 
     threads.yield();
 }
 
-int scani2c(TwoWire w) {
-    Serial.println("I2C scanner. Scanning ...");
-    int count = 0;
-    for (byte i = 1; i < 120; i++) {
-        w.beginTransmission(i);
-        if (w.endTransmission() == 0) {
-            //Serial.print("Found address: ");
-            Serial.print(i, DEC);
-            Serial.print(" (0x");
-            Serial.print(i, HEX);
-            Serial.print(") ; ");
-            count++;
-            delay(1);
-        }
-    }
-    Serial.println("Done.");
-    Serial.print("Found ");
-    Serial.print(count, DEC);
-    Serial.println(" device(s).");
-    return count;
-}
 
 /**Table of Optical Centers**
  *
@@ -427,7 +413,7 @@ void loopvl1() {
                     {
                 for (int c = 0; c < NumOfCollisionSensors; c++) {
                     if (connected_coll[c]) {
-                        vl_collision[c].setROI(16, 16, 199);
+                        vl_collision[c].setROI(16, 16, 199); //full matrix
                         vl_collision[c].startRanging();
                     }
                 }
@@ -440,8 +426,7 @@ void loopvl1() {
                 }
             }
 
-            if (z == 0) //Gestion collision
-                    {
+            if (z == 0) { //Gestion collision
                 for (int c = 0; c < NumOfCollisionSensors; c++) {
                     if (connected_coll[c]) {
                         while (!vl_collision[c].checkForDataReady()) {
@@ -515,8 +500,7 @@ void loopvl2() {
         }
 
         for (int z = 0; z < NumOfZonesPerSensor; z++) {
-            if (z == 0) //Gestion collision
-                    {
+            if (z == 0) { //Gestion collision
                 for (int c = NumOfCollisionSensors; c < NumOfCollisionSensors + NumOfCollisionSensors; c++) {
                     if (connected_coll[c]) {
                         vl_collision[c].setROI(16, 16, 199);
