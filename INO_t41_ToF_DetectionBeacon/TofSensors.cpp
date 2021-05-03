@@ -254,7 +254,7 @@ void tof_setup() {
 
 
 //Attention pas de delay dans cette fonction pour ne pas ralentir la main loop
-void tof_loop(Registers &registers, int debug) {
+void tof_loop( int debug) {//Registers &registers,
     long t_start = elapsedT_us;
 
 

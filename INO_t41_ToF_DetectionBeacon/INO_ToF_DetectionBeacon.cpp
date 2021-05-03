@@ -96,8 +96,6 @@ void setup() {
 }
 
 int8_t calculPosition(float decalage_deg, Registers &new_values) {
-    //360 / 72 = 5 degré
-    //int16_t x_angle_zone[9 * 4] = { 0 };
 
     int filtrage_mm = -1; //attention si on mets plus, par ex 100mm, certaines valeurs sont à zero avec la balise en face et très prets, voir si un calibrage regle le problème  lorsque l'on approche les mains
     //(on filtre en dessous de 150mm ?)
@@ -105,8 +103,16 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
     int final_nb_bots = 0;
 
     int16_t tab[9 * max_nb_bots] = { 0 }; // données des 4 balises z1_p, z1_1=>z1_5
+    float pos[3 * max_nb_bots] = { 0.0 };
+    int16_t dist[max_nb_bots] = { 0 };
     for (int i = 0; i < 9 * max_nb_bots; i++) {
         tab[i] = -1;
+    }
+    for (int i = 0; i < 3 * max_nb_bots; i++) {
+        pos[i] = -1.0;
+    }
+    for (int i = 0; i < max_nb_bots; i++) {
+        dist[i] = -1;
     }
 
     int index_tab_bot = 0;
@@ -193,15 +199,15 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
                     }
                 }
                 break;
-            }else
-            {
-                if (n>=(NumOfZonesPerSensor * NumOfSensors)-1) {
-                    end_=true;
+            }
+            else {
+                if (n >= (NumOfZonesPerSensor * NumOfSensors) - 1) {
+                    end_ = true;
                     break;
                 }
             }
         }
-        if(end_) break;
+        if (end_) break;
         if (p == (NumOfZonesPerSensor * NumOfSensors) - 1) break; //cas d'arret avec chevauchement
         index_tab_bot += 9;
     }
@@ -213,7 +219,10 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         for (int i = 2; i < 9; i++) {
             if (tab[i + 9 * (final_nb_bots - 1)] == -1) {
                 if (c == 0) c = i;
-                tab[i + 9 * (final_nb_bots - 1)] = tab[i - c + 2];
+                if (tab[i - c + 2] != -1) {
+                    tab[i + 9 * (final_nb_bots - 1)] = tab[i - c + 2];
+                    tab[1 + 9 * (final_nb_bots - 1)]++;
+                }
             }
         }
         //on decale
@@ -221,18 +230,15 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
             tab[i - 9] = tab[i];
         }
         //on efface le last
-        for (int i = 9 * (max_nb_bots-1); i < 9 * max_nb_bots; i++) {
+        for (int i = 9 * (max_nb_bots - 1); i < 9 * max_nb_bots; i++) {
             tab[i] = -1;
         }
         final_nb_bots--;
     }
 
+    //TODO ne garder que les balises detectees au dessus de 150mm
 
-//2. pour chaque balise déterminer la zone centre et le capteur concerné
-
-//3. déterminer la distance sur le repère de la balise (= identique au robot)
-
-    //sauvegarde des 3 balises
+    //sauvegarde les logs des 4 balises
     new_values.z1_p = (int8_t) tab[0];
     new_values.z1_n = (int8_t) tab[1];
     new_values.z1_1 = tab[2];
@@ -273,6 +279,106 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
     new_values.z4_6 = tab[34];
     new_values.z4_7 = tab[35];
 
+//2. pour chaque balise déterminer la zone centre et le capteur concerné
+    //360 / 72 = 5 degrés par zone
+
+    //float zone_begin_angle_deg[9*4] = { 0.5 , 0.5+4.8 , 0.5+4.8+4.8 , 0.5+4.8+4.8+4.8}; //+20
+    //float zone_end_angle_deg[9*4] = { 0.5+4.8 , 0.5+4.8+4.8 , 0.5+4.8+4.8+4.8, 0.5+4.8+4.8+4.8}; //+20
+
+    //pour chaque balise detectée
+    for (int i = 1; i <= final_nb_bots; i++) {
+
+        int num_zone_begin = tab[0 + 9 * (i - 1)];
+        int num_zone_end = num_zone_begin + tab[1 + 9 * (i - 1)] - 1;
+
+        float zone_begin_angle_deg = (num_zone_begin / 4) * 20.0 + 0.5 + ((num_zone_begin % 4) * 4.8);
+        float zone_end_angle_deg = (num_zone_end / 4) * 20.0 + 0.5 + ((num_zone_end % 4) * 4.8) + 4.8;
+
+        //determiné l'angle milieu
+        float milieu_deg = (zone_begin_angle_deg + zone_end_angle_deg) / 2.0;
+        //si depassement audessus des 72 zones, on reduit d'un tour
+        if (milieu_deg > 360) { //num_zone_end > 71 &&
+            milieu_deg -= 360;
+        }
+
+        pos[2 + 3 * (i - 1)] = milieu_deg + decalage_deg;
+
+        Serial.print("CALCUL Balise" + String(i));
+        Serial.print(" num_zone_begin = " + String(num_zone_begin));
+        Serial.print(" num_zone_end = " + String(num_zone_end));
+        Serial.print(" zone_begin_angle_deg = " + String(zone_begin_angle_deg));
+        Serial.print(" zone_end_angle_deg = " + String(zone_end_angle_deg));
+        Serial.print(" milieu_deg = " + String(milieu_deg));
+        Serial.println();
+    }
+
+//3. déterminer la distance sur le repère de la balise (= identique au robot)
+
+    //TODO filtrage de la distance sur 2 balises cote à cote, si mm dist alors c'est la meme balise
+    //calcul des distances
+
+    //pour chaque balise detectée calcul de la distance
+
+    int offset_mm = 5;
+    for (int i = 1; i <= final_nb_bots; i++) {
+        int m = 0;
+        int sum = 0;
+        int min = 9999;
+        for (int z = 2 + 9 * (i - 1); z <= 7 + 9 * (i - 1); z++) {
+            //moy de tab[2] à tab[7]
+            if (tab[z] > 60) {
+                if (tab[z] < min) min = tab[z];
+                sum += tab[z];
+                m++;
+            }
+        }
+        if (m > 2) {
+            m--;
+            sum -= min;
+        }
+        float moy = (1.0 * sum / m) + offset_mm;
+        dist[i - 1] = moy + 100; //centre à centre
+
+        Serial.print(" moy(center)" + String(i));
+        Serial.print("=" + String(dist[i - 1]));
+        Serial.print("  ");
+    }
+    Serial.println();
+
+    //pour chaque balise detectée calcul des coordonnées x,y
+    //avec simplification et arrondi trigonometrique avec un seul sin/cos
+    for (int i = 1; i <= final_nb_bots; i++) {
+        float x = (dist[i - 1]) * cos(pos[2 + 3 * (i - 1)] * PI / 180.0);
+        float y = (dist[i - 1]) * sin(pos[2 + 3 * (i - 1)] * PI / 180.0);
+        pos[0 + 3 * (i - 1)] = x;
+        pos[1 + 3 * (i - 1)] = y;
+
+        Serial.print("coord" + String(i));
+        Serial.print(" x=" + String(x));
+        Serial.print(" y=" + String(y));
+        Serial.print("  ");
+    }
+    Serial.println();
+
+    //enregistrement
+
+    new_values.x1_mm = (int16_t) pos[0];
+    new_values.y1_mm = (int16_t) pos[1];
+    new_values.a1_deg = pos[2];
+    new_values.x2_mm = (int16_t) pos[3];
+    new_values.y2_mm = (int16_t) pos[4];
+    new_values.a2_deg = pos[5];
+    new_values.x3_mm = (int16_t) pos[6];
+    new_values.y3_mm = (int16_t) pos[7];
+    new_values.a3_deg = pos[8];
+    new_values.x4_mm = (int16_t) pos[9];
+    new_values.y4_mm = (int16_t) pos[10];
+    new_values.a4_deg = pos[11];
+    new_values.d1_mm = dist[0];
+    new_values.d2_mm = dist[1];
+    new_values.d3_mm = dist[2];
+    new_values.d4_mm = dist[3];
+
     return final_nb_bots;
 }
 
@@ -291,40 +397,74 @@ void loop() {
     Registers new_values;
 
 //Save data into new_values
-    new_values.d1_mm = filteredResult_coll[0];
-    new_values.d2_mm = filteredResult_coll[1];
-    new_values.d3_mm = filteredResult_coll[2];
-    new_values.d4_mm = filteredResult_coll[3];
-    new_values.d5_mm = filteredResult_coll[4];
-    new_values.d6_mm = filteredResult_coll[5];
-    new_values.d7_mm = filteredResult_coll[6];
-    new_values.d8_mm = filteredResult_coll[7];
+    new_values.c1_mm = filteredResult_coll[0];
+    new_values.c2_mm = filteredResult_coll[1];
+    new_values.c3_mm = filteredResult_coll[2];
+    new_values.c4_mm = filteredResult_coll[3];
+    new_values.c5_mm = filteredResult_coll[4];
+    new_values.c6_mm = filteredResult_coll[5];
+    new_values.c7_mm = filteredResult_coll[6];
+    new_values.c8_mm = filteredResult_coll[7];
 
-//Calcul des positions
-    float decalage_deg = 10.0;
-
+    //Calcul des positions
+    float decalage_deg = 0.0;
     new_values.nbDetectedBots = calculPosition(decalage_deg, new_values);
 
     Serial.print("FRONT: ");
-    Serial.print(new_values.d1_mm);
+    Serial.print(new_values.c1_mm);
     Serial.print(" ");
-    Serial.print(new_values.d2_mm);
+    Serial.print(new_values.c2_mm);
     Serial.print(" ");
-    Serial.print(new_values.d3_mm);
+    Serial.print(new_values.c3_mm);
     Serial.print(" ");
-    Serial.print(new_values.d4_mm);
+    Serial.print(new_values.c4_mm);
     Serial.print(" BACK: ");
-    Serial.print(new_values.d5_mm);
+    Serial.print(new_values.c5_mm);
     Serial.print(" ");
-    Serial.print(new_values.d6_mm);
+    Serial.print(new_values.c6_mm);
     Serial.print(" ");
-    Serial.print(new_values.d7_mm);
+    Serial.print(new_values.c7_mm);
     Serial.print(" ");
-    Serial.print(new_values.d8_mm);
+    Serial.println(new_values.c8_mm);
     Serial.print("  FLAGS: ");
     Serial.print(new_values.flags);
     Serial.print(" NBBOTS: ");
     Serial.print(new_values.nbDetectedBots);
+
+    Serial.print(" dxya1: ");
+    Serial.print(new_values.x1_mm);
+    Serial.print(" ");
+    Serial.print(new_values.y1_mm);
+    Serial.print(" ");
+    Serial.print(new_values.a1_deg);
+    Serial.print(" ");
+    Serial.print(new_values.d1_mm);
+    Serial.print(" dxya2: ");
+    Serial.print(new_values.x2_mm);
+    Serial.print(" ");
+    Serial.print(new_values.y2_mm);
+    Serial.print(" ");
+    Serial.print(new_values.a2_deg);
+    Serial.print(" ");
+    Serial.print(new_values.d2_mm);
+    Serial.print(" dxya3: ");
+    Serial.print(new_values.x3_mm);
+    Serial.print(" ");
+    Serial.print(new_values.y3_mm);
+    Serial.print(" ");
+    Serial.print(new_values.a3_deg);
+    Serial.print(" ");
+    Serial.print(new_values.d3_mm);
+    Serial.print(" dxya4: ");
+    Serial.print(new_values.x4_mm);
+    Serial.print(" ");
+    Serial.print(new_values.y4_mm);
+    Serial.print(" ");
+    Serial.print(new_values.a4_deg);
+    Serial.print(" ");
+    Serial.print(new_values.d4_mm);
+
+    Serial.println();
     Serial.print("  R1:");
     Serial.print(new_values.z1_p);
     Serial.print("(");
@@ -404,7 +544,7 @@ void loop() {
     memcpy(&registers, &new_values, sizeof(Registers));
     registers.flags = 1;
 
-    tof_loop(registers, false);
+    tof_loop( false);//registers,
 
     ledPanels_loop(false);
 }
