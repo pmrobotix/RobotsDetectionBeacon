@@ -35,6 +35,8 @@ Settings settings = { 3, 1 };
 Registers registers;
 I2CRegisterSlave registerSlave = I2CRegisterSlave(Slave2, (uint8_t*) &settings, sizeof(Settings), (uint8_t*) &registers, sizeof(Registers));
 
+Threads::Mutex new_data_lock;
+
 int scani2c(TwoWire w) {
     Serial.println("I2C scanner. Scanning ...");
     int count = 0;
@@ -129,8 +131,8 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         for (int n = p + 1; n < (NumOfZonesPerSensor * NumOfSensors); n++) {
 
             int16_t val = filteredResult[n];
-            if (val > filtrage_mm) {
-                //on a trouvé un balise
+            if (val > 100){ //filtrage_mm) { //on prend que la premiere detection au dessus de 100mm
+                //on a trouvé une balise
                 final_nb_bots = nb_bots;
 
                 if (nb_bots >= 4) {
@@ -303,13 +305,13 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
 
         pos[2 + 3 * (i - 1)] = milieu_deg + decalage_deg;
 
-        Serial.print("CALCUL Balise" + String(i));
-        Serial.print(" num_zone_begin = " + String(num_zone_begin));
-        Serial.print(" num_zone_end = " + String(num_zone_end));
-        Serial.print(" zone_begin_angle_deg = " + String(zone_begin_angle_deg));
-        Serial.print(" zone_end_angle_deg = " + String(zone_end_angle_deg));
-        Serial.print(" milieu_deg = " + String(milieu_deg));
-        Serial.println();
+//        Serial.print("CALCUL Balise" + String(i));
+//        Serial.print(" num_zone_begin = " + String(num_zone_begin));
+//        Serial.print(" num_zone_end = " + String(num_zone_end));
+//        Serial.print(" zone_begin_angle_deg = " + String(zone_begin_angle_deg));
+//        Serial.print(" zone_end_angle_deg = " + String(zone_end_angle_deg));
+//        Serial.print(" milieu_deg = " + String(milieu_deg));
+//        Serial.println();
     }
 
 //3. déterminer la distance sur le repère de la balise (= identique au robot)
@@ -339,11 +341,11 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         float moy = (1.0 * sum / m) + offset_mm;
         dist[i - 1] = moy + 100; //centre à centre
 
-        Serial.print(" moy(center)" + String(i));
-        Serial.print("=" + String(dist[i - 1]));
-        Serial.print("  ");
+//        Serial.print(" moy(center)" + String(i));
+//        Serial.print("=" + String(dist[i - 1]));
+//        Serial.print("  ");
     }
-    Serial.println();
+//    Serial.println();
 
     //pour chaque balise detectée calcul des coordonnées x,y
     //avec simplification et arrondi trigonometrique avec un seul sin/cos
@@ -353,12 +355,12 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         pos[0 + 3 * (i - 1)] = x;
         pos[1 + 3 * (i - 1)] = y;
 
-        Serial.print("coord" + String(i));
-        Serial.print(" x=" + String(x));
-        Serial.print(" y=" + String(y));
-        Serial.print("  ");
+//        Serial.print("coord" + String(i));
+//        Serial.print(" x=" + String(x));
+//        Serial.print(" y=" + String(y));
+//        Serial.print("  ");
     }
-    Serial.println();
+//    Serial.println();
 
     //enregistrement
 
@@ -431,7 +433,7 @@ void loop() {
     Serial.print(" NBBOTS: ");
     Serial.print(new_values.nbDetectedBots);
 
-    Serial.print(" dxya1: ");
+    Serial.print(" xyad1: ");
     Serial.print(new_values.x1_mm);
     Serial.print(" ");
     Serial.print(new_values.y1_mm);
@@ -439,7 +441,7 @@ void loop() {
     Serial.print(new_values.a1_deg);
     Serial.print(" ");
     Serial.print(new_values.d1_mm);
-    Serial.print(" dxya2: ");
+    Serial.print(" xyad2: ");
     Serial.print(new_values.x2_mm);
     Serial.print(" ");
     Serial.print(new_values.y2_mm);
@@ -447,7 +449,7 @@ void loop() {
     Serial.print(new_values.a2_deg);
     Serial.print(" ");
     Serial.print(new_values.d2_mm);
-    Serial.print(" dxya3: ");
+    Serial.print(" xyad3: ");
     Serial.print(new_values.x3_mm);
     Serial.print(" ");
     Serial.print(new_values.y3_mm);
@@ -455,7 +457,7 @@ void loop() {
     Serial.print(new_values.a3_deg);
     Serial.print(" ");
     Serial.print(new_values.d3_mm);
-    Serial.print(" dxya4: ");
+    Serial.print(" xyad4: ");
     Serial.print(new_values.x4_mm);
     Serial.print(" ");
     Serial.print(new_values.y4_mm);
@@ -539,10 +541,12 @@ void loop() {
     Serial.print(new_values.z4_7);
     Serial.println();
 
+    new_data_lock.lock();
 // Block copy new values over the top of the old values
 // and then set the "new data" bit.
     memcpy(&registers, &new_values, sizeof(Registers));
     registers.flags = 1;
+    new_data_lock.unlock();
 
     tof_loop( false);//registers,
 

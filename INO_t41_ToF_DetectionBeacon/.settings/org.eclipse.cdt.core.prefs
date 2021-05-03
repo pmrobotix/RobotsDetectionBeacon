@@ -43,7 +43,7 @@ environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.CORE/op
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.CORE/value=teensy4
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FCPU/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FCPU/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FCPU/value=600000000
+environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FCPU/value=816000000
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FLAGS.C/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FLAGS.C/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1056238174/A.BUILD.FLAGS.C/value=
@@ -388,7 +388,7 @@ environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.COM_PORT
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.COM_PORT/value=/dev/ttyACM0
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.ECLIPSE_LOCATION/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.ECLIPSE_LOCATION/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}/
+environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.ECLIPSE_LOCATION/value=${eclipse_home}///////////
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.EXTRA.ALL/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.EXTRA.ALL/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.EXTRA.ALL/value=
@@ -412,7 +412,7 @@ environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.EXTRA.LI
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.EXTRA.LINK/value=
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.MENU/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.MENU/operation=replace
-environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.MENU/value=cpu\=16MHzatmega32U4\nkeys\=fr-fr\nopt\=o2std\nspeed\=600\nusb\=serial
+environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.MENU/value=cpu\=16MHzatmega32U4\nkeys\=fr-fr\nopt\=o2std\nspeed\=816\nusb\=serial
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.OBJCOPY/delimiter=\:
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.OBJCOPY/operation=replace
 environment/project/io.sloeber.core.toolChain.release.1056238174/JANTJE.OBJCOPY/value=${A.RECIPE.OBJCOPY.EEP.PATTERN}\n\t${A.RECIPE.OBJCOPY.HEX.PATTERN}

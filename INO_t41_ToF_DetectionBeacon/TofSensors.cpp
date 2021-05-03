@@ -280,6 +280,7 @@ void tof_loop( int debug) {//Registers &registers,
             int val = filteredResult[(NumOfZonesPerSensor * n) + z];
             if (val > 0)
                 nb_active_filtered_sensors++;
+
             Serial.print(val);
             Serial.print(",");
         }
