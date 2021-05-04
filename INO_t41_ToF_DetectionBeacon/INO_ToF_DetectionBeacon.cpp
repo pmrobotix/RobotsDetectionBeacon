@@ -131,13 +131,10 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         for (int n = p + 1; n < (NumOfZonesPerSensor * NumOfSensors); n++) {
 
             int16_t val = filteredResult[n];
-            if (val > 100){ //filtrage_mm) { //on prend que la premiere detection au dessus de 100mm
+            if (val > 100){ //filtrage_mm) { //on prend que la premiere detection au dessus de 100mm pour filtrer la main qui s'approche
                 //on a trouvé une balise
                 final_nb_bots = nb_bots;
 
-                if (nb_bots >= 4) {
-                    //TODO raise an issue ! Flag
-                }
 
                 //Serial.println("beacon found " + String(n) + " " + String(val));
                 if (index_tab_bot < 9 * max_nb_bots) {
@@ -169,27 +166,27 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
 
                 p = n; //enregistrement du dernier
                 if (index_tab_bot < 9 * max_nb_bots) {
-                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 2) if (filteredResult[n + 1] >= 0) {
+                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 2) if (filteredResult[n + 1] >= 0 && (abs(filteredResult[n + 1]- filteredResult[n]) < 250)) {
                         tab[3 + index_tab_bot] = filteredResult[n + 1];
                         p = n + 1;
                         tab[1 + index_tab_bot] = 2;
-                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 3) if (filteredResult[n + 2] >= 0) {
+                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 3) if (filteredResult[n + 2] >= 0 && (abs(filteredResult[n + 2]- filteredResult[n+1]) < 250)) {
                             tab[4 + index_tab_bot] = filteredResult[n + 2];
                             p = n + 2;
                             tab[1 + index_tab_bot] = 3;
-                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 4) if (filteredResult[n + 3] >= 0) {
+                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 4) if (filteredResult[n + 3] >= 0 && (abs(filteredResult[n + 3]- filteredResult[n+2]) < 250)) {
                                 tab[5 + index_tab_bot] = filteredResult[n + 3];
                                 p = n + 3;
                                 tab[1 + index_tab_bot] = 4;
-                                if (n <= (NumOfZonesPerSensor * NumOfSensors) - 5) if (filteredResult[n + 4] >= 0) {
+                                if (n <= (NumOfZonesPerSensor * NumOfSensors) - 5) if (filteredResult[n + 4] >= 0 && (abs(filteredResult[n + 4]- filteredResult[n+3]) < 250)) {
                                     tab[6 + index_tab_bot] = filteredResult[n + 4];
                                     p = n + 4;
                                     tab[1 + index_tab_bot] = 5;
-                                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 6) if (filteredResult[n + 5] >= 0) {
+                                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 6) if (filteredResult[n + 5] >= 0 && (abs(filteredResult[n + 5]- filteredResult[n+4]) < 250)) {
                                         tab[7 + index_tab_bot] = filteredResult[n + 5];
                                         p = n + 5;
                                         tab[1 + index_tab_bot] = 6;
-                                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 7) if (filteredResult[n + 6] >= 0) {
+                                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 7) if (filteredResult[n + 6] >= 0 && (abs(filteredResult[n + 6]- filteredResult[n+5]) < 250)) {
                                             tab[8 + index_tab_bot] = filteredResult[n + 6];
                                             p = n + 6;
                                             tab[1 + index_tab_bot] = 7;
@@ -215,7 +212,7 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
     }
     int c = 0;
 
-    //gestion du chevauchement de data, on ne retient que max_balises que l'on reduit à max-1
+    //gestion du chevauchement de data < 0, on ne retient que max_balises que l'on reduit à max-1
     if (chevauchement_arriere_nb > 0) {
         //on merge la balise 1 et la dernière (last)
         for (int i = 2; i < 9; i++) {
@@ -412,6 +409,17 @@ void loop() {
     float decalage_deg = 0.0;
     new_values.nbDetectedBots = calculPosition(decalage_deg, new_values);
 
+
+
+    new_data_lock.lock();
+// Block copy new values over the top of the old values
+// and then set the "new data" bit.
+    memcpy(&registers, &new_values, sizeof(Registers));
+    registers.flags = 1;
+    new_data_lock.unlock();
+
+
+
     Serial.print("FRONT: ");
     Serial.print(new_values.c1_mm);
     Serial.print(" ");
@@ -541,12 +549,6 @@ void loop() {
     Serial.print(new_values.z4_7);
     Serial.println();
 
-    new_data_lock.lock();
-// Block copy new values over the top of the old values
-// and then set the "new data" bit.
-    memcpy(&registers, &new_values, sizeof(Registers));
-    registers.flags = 1;
-    new_data_lock.unlock();
 
     tof_loop( false);//registers,
 

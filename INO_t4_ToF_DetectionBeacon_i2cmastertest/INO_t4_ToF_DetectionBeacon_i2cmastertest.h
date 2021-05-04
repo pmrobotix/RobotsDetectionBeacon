@@ -1,17 +1,26 @@
-/*
- * TofSensors.h
- *
- *  Created on: Jan 25, 2021
- *      Author: cho (PM-ROBOTIX)
- */
+// Only modify this file to include
+// - function definitions (prototypes)
+// - include files
+// - extern variable definitions
+// In the appropriate section
 
-#ifndef TOFSENSORS_H_
-#define TOFSENSORS_H_
-
-#include "SparkFun_VL53L1X.h"
-#include "TeensyThreads.h"
+#ifndef _INO_t4_ToF_DetectionBeacon_i2cmastertest_H_
+#define _INO_t4_ToF_DetectionBeacon_i2cmastertest_H_
+#include "Arduino.h"
+//add your includes for the project INO_t4_ToF_DetectionBeacon_i2cmastertest here
 
 
+//end of add your includes here
+
+
+//add your function definitions for the project INO_t4_ToF_DetectionBeacon_i2cmastertest here
+
+// convert float to byte array  source: http://mbed.org/forum/helloworld/topic/2053/
+union float2bytes_t // union consists of one variable represented in a number of different ways
+{
+    float f;
+    unsigned char bytes[sizeof(float)];
+};
 
 // Registers that the caller can both read and write
 struct Settings {
@@ -105,12 +114,6 @@ struct Registers {
 
 };
 
-int scani2c(TwoWire w);
-void tof_setup();
-void tof_loop( int debug=0);//Registers &reg,
-void loopvl1();
-void loopvl2();
 
-
-
-#endif /* TOFSENSORS_H_ */
+//Do not add code below this line
+#endif /* _INO_t4_ToF_DetectionBeacon_i2cmastertest_H_ */
