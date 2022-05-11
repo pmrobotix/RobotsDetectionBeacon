@@ -34,7 +34,7 @@
 		<link>
 			<name>core/core</name>
 			<type>2</type>
-			<location>/home/pmx/APROGRAMS/arduino-1.8.13/hardware/teensy/avr/cores/teensy4</location>
+			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/cores/teensy4</location>
 		</link>
 		<link>
 			<name>libraries/Adafruit_BusIO</name>
@@ -49,7 +49,7 @@
 		<link>
 			<name>libraries/FastLED</name>
 			<type>2</type>
-			<location>/home/pmx/APROGRAMS/arduino-1.8.13/hardware/teensy/avr/libraries/FastLED</location>
+			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/libraries/FastLED</location>
 		</link>
 		<link>
 			<name>libraries/FastLED_NeoMatrix</name>
@@ -69,7 +69,7 @@
 		<link>
 			<name>libraries/SPI</name>
 			<type>2</type>
-			<location>/home/pmx/APROGRAMS/arduino-1.8.13/hardware/teensy/avr/libraries/SPI</location>
+			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/libraries/SPI</location>
 		</link>
 		<link>
 			<name>libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9</name>
@@ -79,12 +79,12 @@
 		<link>
 			<name>libraries/TeensyThreads</name>
 			<type>2</type>
-			<location>/home/pmx/APROGRAMS/arduino-1.8.13/hardware/teensy/avr/libraries/TeensyThreads</location>
+			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/libraries/TeensyThreads</location>
 		</link>
 		<link>
 			<name>libraries/WS2812Serial</name>
 			<type>2</type>
-			<location>/home/pmx/APROGRAMS/arduino-1.8.13/hardware/teensy/avr/libraries/WS2812Serial</location>
+			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/libraries/WS2812Serial</location>
 		</link>
 		<link>
 			<name>libraries/teensy4_i2c-master</name>

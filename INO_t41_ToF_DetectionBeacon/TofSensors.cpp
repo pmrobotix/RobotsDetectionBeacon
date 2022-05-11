@@ -8,16 +8,14 @@
 #include "INO_ToF_DetectionBeacon.h"
 #include "TofSensors.h"
 #include <i2c_register_slave.h>
-//
-//old- front:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
-//old- Back:Violet05-Jaune06-Orange26-Rouge27-Marron28-Noir29-Blanc30-Gris31-violet32
-//old- int shutd_pin[18] = { 41, 40, 39, 38, 37, 36, 35, 34, 33,  05, 06, 26, 27, 28, 29, 30, 31, 32 };
+
 
 //Nouvelle config avec detecteurs
 // front[9] back[9]
 //front[9]:Violet41-Jaune40-Orange39-Rouge38-Marron37-Noir36-Blanc35-Gris34-violet33
 //Back[9]:Violet20-Jaune21-Orange22-Rouge23-Marron4-Noir3-Blanc2-Gris1-violet0
-int shutd_pin[NumOfSensors] = { 20, 21, 22, 23, 4, 3, 2, 1, 0, 5, 6, 26, 27, 28, 29, 30, 31, 32 };
+//int shutd_pin[NumOfSensors] = { 20, 21, 22, 23, 4, 3, 2, 1, 0, 5, 6, 26, 27, 28, 29, 30, 31, 32 };//old config
+int shutd_pin[NumOfSensors] = { 23, 22, 21, 20, 0, 1, 2, 3, 4, 32, 31, 30, 29, 28, 27, 26, 6, 5 };
 
 //front[4]= BAS HAUT BAS HAUT  back[4]
 int shutd_pin_collision[NumOfCollisionSensors + NumOfCollisionSensors] = { 40, 39, 38, 37, 36, 35, 34, 33 };
@@ -69,15 +67,15 @@ elapsedMicros elapsedT_us = 0;
 
 void tof_setup() {
 
-    //Front vl on i2c 18 SDA / 19 SCL
+    //initialise all with -1
+    //Front vl on i2c  17 SDA1 / 16 SCL1
     for (int i = 0; i < NumOfSensors / 2; i++) {
-        vl[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
-    }
-    //Back vl on i2c  17 SDA1 / 16 SCL1
-    for (int i = NumOfSensors / 2; i < NumOfSensors; i++) {
         vl[i] = SFEVL53L1X(Wire1, shutd_pin[i], -1);
     }
-
+    //Back vl on i2c  18 SDA / 19 SCL
+    for (int i = NumOfSensors / 2; i < NumOfSensors; i++) {
+        vl[i] = SFEVL53L1X(Wire, shutd_pin[i], -1);
+    }
     //config collision Front vl on i2c 18 SDA / 19 SCL
     for (int i = 0; i < (NumOfCollisionSensors); i++) {
         vl_collision[i] = SFEVL53L1X(Wire, shutd_pin_collision[i], -1);
@@ -243,6 +241,9 @@ void tof_setup() {
     }
     Serial.println();
 
+
+
+
     threads.delay(1000);
     wait_TofVLReady = true;
 
@@ -356,7 +357,7 @@ void tof_loop( int debug) {//Registers &registers,
 
 
     //synchronisation des 2 threads de VL
-    while (!shared_endloop1 || !shared_endloop2) {
+    while (!shared_endloop1 || !shared_endloop2) { //TODO si un VL est deconnecter, verifier pour ca double le temps de check
         threads.yield();
     }
     long t_waitthreads = elapsedT_us;

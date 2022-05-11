@@ -31,11 +31,16 @@ int nb_active_filtered_sensors;
 int videoMode;
 int ii = 0;
 
-Settings settings = { 3, 1 };
+//initialise the settings
+Settings settings = { 0x03, 0x01, 0x00, 0x00 };
+
 Registers registers;
 I2CRegisterSlave registerSlave = I2CRegisterSlave(Slave2, (uint8_t*) &settings, sizeof(Settings), (uint8_t*) &registers, sizeof(Registers));
 
 Threads::Mutex new_data_lock;
+
+//analog input
+int val;
 
 int scani2c(TwoWire w) {
     Serial.println("I2C scanner. Scanning ...");
@@ -83,7 +88,7 @@ void setup() {
     // initialize the digital pin as an output for LEDS
     pinMode(LED_BUILTIN, OUTPUT); // Green
     pinMode(LED_BUILTIN + 1, OUTPUT); //Red
-    pinMode(LED_BUILTIN + 2, OUTPUT); //optional
+    //pinMode(LED_BUILTIN + 2, OUTPUT); //optional replace by ADC
 
     videoMode = 0;
 
@@ -131,10 +136,9 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
         for (int n = p + 1; n < (NumOfZonesPerSensor * NumOfSensors); n++) {
 
             int16_t val = filteredResult[n];
-            if (val > 100){ //filtrage_mm) { //on prend que la premiere detection au dessus de 100mm pour filtrer la main qui s'approche
+            if (val > 100) { //filtrage_mm) { //on prend que la premiere detection au dessus de 100mm pour filtrer la main qui s'approche
                 //on a trouvé une balise
                 final_nb_bots = nb_bots;
-
 
                 //Serial.println("beacon found " + String(n) + " " + String(val));
                 if (index_tab_bot < 9 * max_nb_bots) {
@@ -166,36 +170,43 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
 
                 p = n; //enregistrement du dernier
                 if (index_tab_bot < 9 * max_nb_bots) {
-                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 2) if (filteredResult[n + 1] >= 0 && (abs(filteredResult[n + 1]- filteredResult[n]) < 250)) {
-                        tab[3 + index_tab_bot] = filteredResult[n + 1];
-                        p = n + 1;
-                        tab[1 + index_tab_bot] = 2;
-                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 3) if (filteredResult[n + 2] >= 0 && (abs(filteredResult[n + 2]- filteredResult[n+1]) < 250)) {
-                            tab[4 + index_tab_bot] = filteredResult[n + 2];
-                            p = n + 2;
-                            tab[1 + index_tab_bot] = 3;
-                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 4) if (filteredResult[n + 3] >= 0 && (abs(filteredResult[n + 3]- filteredResult[n+2]) < 250)) {
-                                tab[5 + index_tab_bot] = filteredResult[n + 3];
-                                p = n + 3;
-                                tab[1 + index_tab_bot] = 4;
-                                if (n <= (NumOfZonesPerSensor * NumOfSensors) - 5) if (filteredResult[n + 4] >= 0 && (abs(filteredResult[n + 4]- filteredResult[n+3]) < 250)) {
-                                    tab[6 + index_tab_bot] = filteredResult[n + 4];
-                                    p = n + 4;
-                                    tab[1 + index_tab_bot] = 5;
-                                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 6) if (filteredResult[n + 5] >= 0 && (abs(filteredResult[n + 5]- filteredResult[n+4]) < 250)) {
-                                        tab[7 + index_tab_bot] = filteredResult[n + 5];
-                                        p = n + 5;
-                                        tab[1 + index_tab_bot] = 6;
-                                        if (n <= (NumOfZonesPerSensor * NumOfSensors) - 7) if (filteredResult[n + 6] >= 0 && (abs(filteredResult[n + 6]- filteredResult[n+5]) < 250)) {
-                                            tab[8 + index_tab_bot] = filteredResult[n + 6];
-                                            p = n + 6;
-                                            tab[1 + index_tab_bot] = 7;
+                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 2)
+                        if (filteredResult[n + 1] >= 0 && (abs(filteredResult[n + 1]- filteredResult[n]) < 250)) {
+                            tab[3 + index_tab_bot] = filteredResult[n + 1];
+                            p = n + 1;
+                            tab[1 + index_tab_bot] = 2;
+                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 3)
+                                if (filteredResult[n + 2] >= 0 && (abs(filteredResult[n + 2]- filteredResult[n+1]) < 250)) {
+                                    tab[4 + index_tab_bot] = filteredResult[n + 2];
+                                    p = n + 2;
+                                    tab[1 + index_tab_bot] = 3;
+                                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 4)
+                                        if (filteredResult[n + 3] >= 0 && (abs(filteredResult[n + 3]- filteredResult[n+2]) < 250)) {
+                                            tab[5 + index_tab_bot] = filteredResult[n + 3];
+                                            p = n + 3;
+                                            tab[1 + index_tab_bot] = 4;
+                                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 5)
+                                                if (filteredResult[n + 4] >= 0 && (abs(filteredResult[n + 4]- filteredResult[n+3]) < 250)) {
+                                                    tab[6 + index_tab_bot] = filteredResult[n + 4];
+                                                    p = n + 4;
+                                                    tab[1 + index_tab_bot] = 5;
+                                                    if (n <= (NumOfZonesPerSensor * NumOfSensors) - 6)
+                                                        if (filteredResult[n + 5] >= 0 && (abs(filteredResult[n + 5]- filteredResult[n+4]) < 250)) {
+                                                            tab[7 + index_tab_bot] = filteredResult[n + 5];
+                                                            p = n + 5;
+                                                            tab[1 + index_tab_bot] = 6;
+                                                            if (n <= (NumOfZonesPerSensor * NumOfSensors) - 7)
+                                                                if (filteredResult[n + 6] >= 0
+                                                                        && (abs(filteredResult[n + 6]- filteredResult[n+5]) < 250)) {
+                                                                    tab[8 + index_tab_bot] = filteredResult[n + 6];
+                                                                    p = n + 6;
+                                                                    tab[1 + index_tab_bot] = 7;
+                                                                }
+                                                        }
+                                                }
                                         }
-                                    }
                                 }
-                            }
                         }
-                    }
                 }
                 break;
             }
@@ -392,8 +403,22 @@ void loop() {
         digitalWrite(LED_BUILTIN + 1, LOW);
     }
 
+
+    //analog part
+    val = analogRead(1);
+    Serial.print("analog A1 is: ");
+    Serial.println(val);
+    //default=>510
+    //4,7k =>462
+    //1k=>340
+    //470=>246
+
+
 // Gather raw data and convert to output values
     Registers new_values;
+
+    //analog value
+    new_values.reserved_analog = val;
 
 //Save data into new_values
     new_values.c1_mm = filteredResult_coll[0];
@@ -409,16 +434,12 @@ void loop() {
     float decalage_deg = 0.0;
     new_values.nbDetectedBots = calculPosition(decalage_deg, new_values);
 
-
-
     new_data_lock.lock();
 // Block copy new values over the top of the old values
 // and then set the "new data" bit.
+    registers.flags = 1 && 0x01;
     memcpy(&registers, &new_values, sizeof(Registers));
-    registers.flags = 1;
     new_data_lock.unlock();
-
-
 
     Serial.print("FRONT: ");
     Serial.print(new_values.c1_mm);
@@ -549,8 +570,7 @@ void loop() {
     Serial.print(new_values.z4_7);
     Serial.println();
 
-
-    tof_loop( false);//registers,
+    tof_loop(false);    //registers,
 
     ledPanels_loop(false);
 }
