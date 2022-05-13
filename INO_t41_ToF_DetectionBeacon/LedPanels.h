@@ -19,7 +19,7 @@
 #include "fonts.h"
 #include <Fonts/Picopixel.h>
 
-#define BRIGHTNESS 80
+#define BRIGHTNESS 60
 
 #define DISABLE_WHITE
 
@@ -115,6 +115,7 @@ void display_resolution();
 void display_CountInv(int fromNumber);
 void display_INVscrollText(String txt, int delay_ms = 75);
 void display_INVscrollTextWithBitmap(String txt, int bmp_num, int delay_ms = 75);
+void display_INVscrollTextWithBitmapAndUA(String txt, int bitmap, int delay_ms = 75);
 void display_scrollText(String txt);
 void display_scrollText_old();
 void display_dist();
