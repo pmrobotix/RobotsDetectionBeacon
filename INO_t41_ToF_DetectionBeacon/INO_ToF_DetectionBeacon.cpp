@@ -40,7 +40,7 @@ I2CRegisterSlave registerSlave = I2CRegisterSlave(Slave2, (uint8_t*) &settings, 
 Threads::Mutex new_data_lock;
 
 //analog input
-int val;
+int analog_value;;
 
 int scani2c(TwoWire w) {
     Serial.println("I2C scanner. Scanning ...");
@@ -405,9 +405,9 @@ void loop() {
 
 
     //analog part
-    val = analogRead(1);
+    analog_value = analogRead(1);
     Serial.print("analog A1 is: ");
-    Serial.println(val);
+    Serial.println(analog_value);
     //default=>510
     //4,7k =>462
     //1k=>340
@@ -418,7 +418,7 @@ void loop() {
     Registers new_values;
 
     //analog value
-    new_values.reserved_analog = val;
+    new_values.reserved_analog = analog_value;
 
 //Save data into new_values
     new_values.c1_mm = filteredResult_coll[0];
@@ -431,7 +431,7 @@ void loop() {
     new_values.c8_mm = filteredResult_coll[7];
 
     //Calcul des positions
-    float decalage_deg = 0.0;
+    float decalage_deg = -20.0;
     new_values.nbDetectedBots = calculPosition(decalage_deg, new_values);
 
     new_data_lock.lock();

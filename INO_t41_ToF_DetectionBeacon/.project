@@ -37,14 +37,14 @@
 			<location>/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/cores/teensy4</location>
 		</link>
 		<link>
-			<name>libraries/Adafruit_BusIO</name>
+			<name>libraries/Adafruit-GFX-Library-master-1.11.1-t4slave</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/Adafruit_BusIO</location>
+			<location>/home/pmx/Arduino/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave</location>
 		</link>
 		<link>
-			<name>libraries/Adafruit_GFX_Library</name>
+			<name>libraries/Adafruit_BusIO-T4slave</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/Adafruit_GFX_Library</location>
+			<location>/home/pmx/Arduino/libraries/Adafruit_BusIO-T4slave</location>
 		</link>
 		<link>
 			<name>libraries/FastLED</name>

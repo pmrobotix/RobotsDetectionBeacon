@@ -41,8 +41,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/core/core}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_GFX_Library}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED_NeoMatrix}&quot;"/>
@@ -53,8 +51,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/WS2812Serial}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
@@ -64,6 +60,10 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -77,8 +77,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/core/core}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_GFX_Library}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED_NeoMatrix}&quot;"/>
@@ -89,8 +87,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/WS2812Serial}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
@@ -100,6 +96,10 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -113,8 +113,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/core/core}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_GFX_Library}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED_NeoMatrix}&quot;"/>
@@ -125,8 +123,6 @@
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/WS2812Serial}&quot;"/>
                                     									
-                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO}&quot;"/>
-                                    									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
@@ -136,6 +132,10 @@
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
                                     									
                                     <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
+                                    									
+                                    <listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
                                     								
                                 </option>
                                 								
@@ -157,7 +157,7 @@
                     					
                     <sourceEntries>
                         						
-                        <entry excluding="libraries/FastLED/ci|libraries/teensy4_i2c-master/lib|libraries/teensy4_i2c-master/include|libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9/.github|libraries/WS2812Serial/docs|libraries/LEDMatrix-master/travis|libraries/FastLED/lib8tion|libraries/FastLED/platforms|libraries/FastLED/docs|libraries/Adafruit_GFX_Library/fontconvert|libraries/Adafruit_GFX_Library/Fonts|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+                        <entry excluding="libraries/Adafruit-GFX-Library-master-1.11.1-t4slave/fontconvert|libraries/Adafruit-GFX-Library-master-1.11.1-t4slave/.github|libraries/Adafruit-GFX-Library-master-1.11.1-t4slave/Fonts|libraries/FastLED/ci|libraries/teensy4_i2c-master/lib|libraries/teensy4_i2c-master/include|libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9/.github|libraries/WS2812Serial/docs|libraries/LEDMatrix-master/travis|libraries/FastLED/lib8tion|libraries/FastLED/platforms|libraries/FastLED/docs|libraries/Adafruit_GFX_Library/fontconvert|libraries/Adafruit_GFX_Library/Fonts|libraries/?*/**/?xamples/**|libraries/?*/**/?xtras/**|libraries/?*/**/test*/**|libraries/?*/**/third-party/**|libraries/**/._*|libraries/?*/utility/*/*" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
                         					
                     </sourceEntries>
                     				

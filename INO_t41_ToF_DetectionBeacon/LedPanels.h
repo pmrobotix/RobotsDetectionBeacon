@@ -19,7 +19,7 @@
 #include "fonts.h"
 #include <Fonts/Picopixel.h>
 
-#define BRIGHTNESS 60
+#define BRIGHTNESS 20
 
 #define DISABLE_WHITE
 
@@ -93,6 +93,8 @@ void ledPanels_loop(int debug = 0);
 void ledPanels_setup();
 void ledPanels_setup2();
 
+
+void display_UA();
 void display_INVscrollTextPerStep(String txt, int delay_nb_period);
 void add_display_PointsNumber();
 void display_leds_thread();

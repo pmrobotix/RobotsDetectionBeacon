@@ -148,8 +148,10 @@ void ledPanels_setup2() {
 //                threads.yield();
 //    }
 //    count_pixels();
+//    while (1) {
 //
-//    count_pixels_on_by_one();
+//        count_pixels_on_by_one();
+//    }
     //TESTS END
 
     threads.addThread(display_leds_thread);
@@ -180,6 +182,7 @@ void display_leds_thread() {
 
 #endif
 
+
             //DISPLAY
             add_display_PointsNumber();
             add_display_collision(); //affichage des VL liés à la collisions
@@ -193,14 +196,19 @@ void display_leds_thread() {
         }
         if (videoMode == 1) {
             matrix->clear();
-            display_scrollRgbBitmap();
+            //display_scrollRgbBitmap();
+
             //display_INVscrollText("Hello I'm PMX!");
             //display_INVscrollTextWithBitmap("Peace and peace !", 0, 30);
-            display_INVscrollTextWithBitmapAndUA("Peace and peace !", 0, 30);
+            //display_INVscrollTextWithBitmapAndUA("Don't Touch !", 0, 30);
+            display_UA();
+
             matrix->show();
             //threads.delay(2000);
             videoMode = 0;
+
         }
+
         //long t_end = elapsedTime_us;
         //Serial.println("time_led_us="+String(t_end-t_start));
 
@@ -288,8 +296,8 @@ void add_display_VL_out() {
         else val2 = filteredResult[0];
         if (val == -2 || val2 == -2) valresult = -2;
 
-        //int decalage = 2;//balise 2021
-        int decalage = 0;        //balise 2022
+        int decalage = 2;//balise 2021
+        //int decalage = 0;        //balise 2022
 
         //int maxval = distance_t[n];
         //        int led_dist = map(maxval, 20, 700, 0, 7);
@@ -431,8 +439,8 @@ void add_display_data() {
         int maxval = max(val, val2);
         //tmp += maxval + " ";
 
-        //int decalage = 2;//balise 2021
-        int decalage = 0;    //balise 2022
+        int decalage = 2;//balise 2021
+        //int decalage = 0;    //balise 2022
 
         int x_decal = (n / 2) + decalage;
         if (x_decal >= 36) x_decal = x_decal - 36;
@@ -480,8 +488,8 @@ void add_display_pmx() {
 
         int led_dist = map(d_mm, 30, 1500, 0, 7);
 
-        //int decalage = 2;//balise 2021
-        int decalage = 0;    //balise 2022
+        int decalage = 2;//balise 2021
+        //int decalage = 0;    //balise 2022
 
         //int led_x = map(a_deg, 0, 360, 2, 38); //Avec l'ajustement de zone entre les VL et les leds sur la balise (OLD VERSION)
         int led_x = map(a_deg, 0, 360, 0 + decalage, 36 + decalage); //Avec l'ajustement de zone entre les VL et les leds sur la balise
@@ -635,8 +643,8 @@ void add_display_dist() {
         if ((status_t[n + 1] == 0 || status_t[n + 1] == 2) && SigPerSPAD_t[n + 1] > 1000) val2 = distance_t[n + 1];
         int maxval = max(val, val2);
 
-        //int decalage = 2;//balise 2021
-        int decalage = 0;            //balise 2022
+        int decalage = 2;//balise 2021
+        //int decalage = 0;            //balise 2022
 
         //int maxval = distance_t[n];
         int led_dist = map(maxval, 100, 900, 0, 7);
@@ -690,8 +698,8 @@ void add_display_dist() {
         if (led_dist < 0) led_dist = 0;
         if (led_dist > 7) led_dist = 7;
 
-        //int decalage = 2;//balise 2021 //+2=Nb de declage de zone entre les VL et les leds sur la balise
-        int decalage = 0;            //balise 2022
+        int decalage = 2;//balise 2021 //+2=Nb de declage de zone entre les VL et les leds sur la balise
+        //int decalage = 0;            //balise 2022
 
         int x_decal = (moy_x / 2) + decalage;
         if (x_decal >= 36) x_decal = x_decal - 36;
@@ -738,8 +746,8 @@ void add_display_dist() {
         int maxval = max(val, val2);
         tmp += maxval + " ";
 
-        //int decalage = 2;//balise 2021 //+2=Nb de declage de zone entre les VL et les leds sur la balise
-        int decalage = 0;            //balise 2022
+        int decalage = 2;//balise 2021 //+2=Nb de declage de zone entre les VL et les leds sur la balise
+        //int decalage = 0;            //balise 2022
 
         //int maxval = distance_t[n];
 //        int led_dist = map(maxval, 20, 700, 0, 7);
@@ -839,14 +847,10 @@ RGB_bmp[][64] = {
                 0x0F0, 0x0F0, 0x0F0, 0x0F0, 0x0F0, 0x0F0, },
 
         // 04: low blue to high blue
-              { 0x100, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-                0x200, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-                0x300, 0x300, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-                0x500, 0x500, 0x500, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-                0x700, 0x700, 0x700, 0x700, 0x700, 0x900, 0xA00, 0xF00,
-                0x900, 0x900, 0x900, 0x900, 0x900, 0x900, 0xA00, 0xF00,
-                0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xF00,
-                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, },
+        { 0x100, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00, 0x200, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00, 0x300, 0x300, 0x300, 0x500,
+                0x700, 0x900, 0xA00, 0xF00, 0x500, 0x500, 0x500, 0x500, 0x700, 0x900, 0xA00, 0xF00, 0x700, 0x700, 0x700, 0x700, 0x700, 0x900, 0xA00,
+                0xF00, 0x900, 0x900, 0x900, 0x900, 0x900, 0x900, 0xA00, 0xF00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xF00, 0xF00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, },
 
         // 05: 1 black, 2R, 2O, 2G, 1B with 4 blue lines rising right
         { 0x000, 0x200, 0x000, 0x400, 0x000, 0x800, 0x000, 0xF00, 0x000, 0x201, 0x002, 0x403, 0x004, 0x805, 0x006, 0xF07, 0x008, 0x209, 0x00A, 0x40B,
@@ -884,15 +888,25 @@ RGB_bmp[][64] = {
                 0x00F, 0x00F, 0x000, 0x000, 0x0F4, 0x0F3, 0x000, 0x000, 0x00F, 0x000, 0x00F, 0x000, 0x000, 0x000, 0x000, 0x00F, 0x000, 0x000, 0x000,
                 0x00F, 0x00F, 0x00F, 0x00F, 0x000, 0x000, },
 
-                // 04: low blue to high blue / UA FLAG
-          { 0x100, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-            0x200, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-            0x300, 0x300, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-            0x500, 0x500, 0x500, 0x500, 0x700, 0x900, 0xA00, 0xF00,
-            0x700, 0x700, 0x700, 0x700, 0x700, 0x900, 0xA00, 0xF00,
-            0x900, 0x900, 0x900, 0x900, 0x900, 0x900, 0xA00, 0xF00,
-            0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xF00,
-            0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, },};
+        // 11: low blue to high blue / UA FLAG
+        {       0x100, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x200, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x300, 0x300, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x500, 0x500, 0x500, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, },
+
+                // 12: degradé
+        {       0x100, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x200, 0x200, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x300, 0x300, 0x300, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x500, 0x500, 0x500, 0x500, 0x700, 0x900, 0xA00, 0xF00,
+                0x700, 0x700, 0x700, 0x700, 0x700, 0x900, 0xA00, 0xF00,
+                0x900, 0x900, 0x900, 0x900, 0x900, 0x900, 0xA00, 0xF00,
+                0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xA00, 0xF00,
+                0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, 0xF00, },};
 
 // Scroll within big bitmap so that all if it becomes visible or bounce a small one.
 // If the bitmap is bigger in one dimension and smaller in the other one, it will
@@ -1185,6 +1199,24 @@ void display_INVscrollTextWithBitmap(String txt, int bitmap, int delay_ms) {
 
 }
 
+void display_UA(){ //String txt, int bitmap, int delay_ms) {
+    matrix->clear();
+
+    //jaune
+    matrix->drawLine(0, 7, mw, 7, matrix->Color(255, 255, 0));
+    matrix->drawLine(0, 6, mw, 6, matrix->Color(255, 255, 0));
+    matrix->drawLine(0, 5, mw, 5, matrix->Color(255, 255, 0));
+    matrix->drawLine(0, 4, mw, 4, matrix->Color(255, 255, 0));
+
+    //bleu
+    matrix->drawLine(0, 3, mw, 3, matrix->Color(0, 255, 255));
+    matrix->drawLine(0, 2, mw, 2, matrix->Color(0, 255, 255));
+    matrix->drawLine(0, 1, mw, 1, matrix->Color(0, 255, 255));
+    matrix->drawLine(0, 0, mw, 0, matrix->Color(0, 255, 255));
+
+    matrix->show();
+    threads.delay(10000);
+}
 void display_INVscrollTextWithBitmapAndUA(String txt, int bitmap, int delay_ms) {
 
     matrix->setTextSize(1);
@@ -1200,10 +1232,14 @@ void display_INVscrollTextWithBitmapAndUA(String txt, int bitmap, int delay_ms) 
         display_rgbBitmap(11, x - 12, 0); //UA flag
 
         //matrix->setTextColor(matrix->Color(255, 128, 0));
-        matrix->setTextColor(x * 10);
+        //matrix->setTextColor(x * 10);
+        matrix->setTextColor(LED_BLUE_HIGH);
 
         matrix->setCursor(x, 0);
         matrix->print(txt);
+
+        matrix->drawLine(0, 7, mw, 7, matrix->Color(255, 255, 0));
+        //matrix->drawLine(0, 0, mw, 0, matrix->Color(255, 255, 0));
 
         //add_display_dist();
 
@@ -1226,10 +1262,8 @@ void display_INVscrollTextPerStep(String txt, int delay_nb_period) {
     matrix->setTextWrap(false);
     if (INVscrollTextPerStep_delay % delay_nb_period == 0) {
         INVscrollTextPerStep_x++;
-        if (INVscrollTextPerStep_x > mw) INVscrollTextPerStep_x = 0- (txt.length() * 5);
+        if (INVscrollTextPerStep_x > mw) INVscrollTextPerStep_x = 0 - (txt.length() * 5);
     }
-
-
 
     //matrix->setTextColor(matrix->Color(255, 128, 0));
     matrix->setTextColor(LED_BLUE_HIGH);
@@ -1237,7 +1271,7 @@ void display_INVscrollTextPerStep(String txt, int delay_nb_period) {
     matrix->setCursor(INVscrollTextPerStep_x, 0);
     matrix->print(txt);
 
-    matrix->drawLine(0, 7, mw ,7,  matrix->Color(255, 255, 0));
+    matrix->drawLine(0, 7, mw, 7, matrix->Color(255, 255, 0));
 
     matrix->endWrite();
 
@@ -1358,11 +1392,23 @@ void flag() {
 
 void count_pixels_on_by_one() {
     matrix_clear();
-    for (int i = 0; i < mh; i++) {
-        for (int j = 0; j < mw; j++) {
-            matrix->drawPixel(j, i, CRGB(255, 0, 0));
+    int ii = 0;
+    delay(1000);
+    for (int j = 0; j < mw; j++) {
+        for (int i = 0; i < mh; i++) {
+            matrix->drawPixel(j, i, CRGB(255, 255, 255));
             matrix->show();
-            delay(100);
+            ii++;
+            if (ii % 2) {
+                digitalWrite(LED_BUILTIN, HIGH);
+
+            }
+            else {
+                digitalWrite(LED_BUILTIN, LOW);
+
+            }
+
+            delay(50);
             threads.yield();
         }
     }
