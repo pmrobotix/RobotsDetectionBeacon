@@ -39,12 +39,12 @@
 		<link>
 			<name>libraries/Adafruit-GFX-Library-master-1.11.1-t4slave</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/Adafruit-GFX-Library-master-1.11.1-t4slave</location>
 		</link>
 		<link>
 			<name>libraries/Adafruit_BusIO-T4slave</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/Adafruit_BusIO-T4slave</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/Adafruit_BusIO-T4slave</location>
 		</link>
 		<link>
 			<name>libraries/FastLED</name>
@@ -54,17 +54,17 @@
 		<link>
 			<name>libraries/FastLED_NeoMatrix</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/FastLED_NeoMatrix</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/FastLED_NeoMatrix</location>
 		</link>
 		<link>
 			<name>libraries/Framebuffer_GFX</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/Framebuffer_GFX</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/Framebuffer_GFX</location>
 		</link>
 		<link>
 			<name>libraries/LEDMatrix-master</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/LEDMatrix-master</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/LEDMatrix-master</location>
 		</link>
 		<link>
 			<name>libraries/SPI</name>
@@ -74,7 +74,7 @@
 		<link>
 			<name>libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9</location>
 		</link>
 		<link>
 			<name>libraries/TeensyThreads</name>
@@ -89,7 +89,7 @@
 		<link>
 			<name>libraries/teensy4_i2c-master</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/teensy4_i2c-master</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/teensy4_i2c-master</location>
 		</link>
 	</linkedResources>
 </projectDescription>

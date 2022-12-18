@@ -39,7 +39,7 @@
 		<link>
 			<name>libraries/teensy4_i2c-master</name>
 			<type>2</type>
-			<location>/home/pmx/Arduino/libraries/teensy4_i2c-master</location>
+			<location>/home/pmx/git/RobotsDetectionBeacon/Libraries/teensy4_i2c-master</location>
 		</link>
 	</linkedResources>
 </projectDescription>
