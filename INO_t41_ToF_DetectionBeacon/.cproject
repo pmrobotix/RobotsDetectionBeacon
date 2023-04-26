@@ -28,10 +28,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.cpp.sketch.input.252273093" name="CPP source files" superClass="io.sloeber.compiler.cpp.sketch.input"/>
 							</tool>
@@ -46,10 +46,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.c.sketch.input.170820678" name="C Source Files" superClass="io.sloeber.compiler.c.sketch.input"/>
 							</tool>
@@ -64,10 +64,10 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Framebuffer_GFX}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SPI}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/SparkFun_VL53L1X_Arduino_Library-1.2.9/src}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit-GFX-Library-master-1.11.1-t4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/Adafruit_BusIO-T4slave}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/teensy4_i2c-master/src}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/INO_t41_ToF_DetectionBeacon/libraries/FastLED/src}&quot;"/>
 								</option>
 								<inputType id="io.sloeber.compiler.S.sketch.input.878439633" name="Assembly source files" superClass="io.sloeber.compiler.S.sketch.input"/>
 							</tool>
