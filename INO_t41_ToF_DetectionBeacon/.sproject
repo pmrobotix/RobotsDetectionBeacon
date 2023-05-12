@@ -1,11 +1,10 @@
 Config.Release.board.BOARD.ID=teensy41
-Config.Release.board.BOARD.MENU.cpu=16MHzatmega32U4
 Config.Release.board.BOARD.MENU.keys=fr-fr
-Config.Release.board.BOARD.MENU.opt=o2std
+Config.Release.board.BOARD.MENU.opt=o1std
 Config.Release.board.BOARD.MENU.speed=816
 Config.Release.board.BOARD.MENU.usb=serial
-Config.Release.board.BOARD.TXT=/home/pmx/APROGRAMS/arduino-1.8.19/hardware/teensy/avr/boards.txt
-Config.Release.board.PROGRAMMER.NAME=Default
+Config.Release.board.BOARD.TXT=${SLOEBER_HOME}/arduinoPlugin/packages/teensy/hardware/avr/1.57.2/boards.txt
+Config.Release.board.PROGRAMMER.NAME=
 Config.Release.board.UPLOAD.PORT=/dev/ttyACM0
 Config.Release.compile.sloeber.extra.all=
 Config.Release.compile.sloeber.extra.archive=

@@ -67,7 +67,7 @@ int scani2c(TwoWire w) {
 void on_read_isr(uint8_t reg_num) {
     // Clear the "new data" bit so the master knows it's
     // already read this set of values.
-    registers.flags = 0;
+    registers.flags = registers.flags & 0xFE; //mise a zero du BIT0
 }
 
 void setup() {
@@ -78,7 +78,7 @@ void setup() {
     Wire1.setClock(1000000); // use fast mode I2C
     Wire1.begin();
 
-    // Start listening on I2C4 with address 0xDD
+    // Start listening on I2C4 with address 0x2D
     registerSlave.listen(0x2D);
     registerSlave.after_read(on_read_isr);
 
@@ -347,7 +347,7 @@ int8_t calculPosition(float decalage_deg, Registers &new_values) {
             sum -= min;
         }
         float moy = (1.0 * sum / m) + offset_mm;
-        dist[i - 1] = moy + 100; //centre à centre
+        dist[i - 1] = moy + 100; //centre à centre //TODO ne fonctionne pas, ca donne la distance entre les capteur et le catadiopthre
 
 //        Serial.print(" moy(center)" + String(i));
 //        Serial.print("=" + String(dist[i - 1]));
@@ -403,8 +403,8 @@ void loop() {
         digitalWrite(LED_BUILTIN + 1, LOW);
     }
 
-
-    //analog part
+/*
+    //analog part 2022
     analog_value = analogRead(1);
     Serial.print("analog A1 is: ");
     Serial.println(analog_value);
@@ -412,13 +412,13 @@ void loop() {
     //4,7k =>462
     //1k=>340
     //470=>246
-
+*/
 
 // Gather raw data and convert to output values
     Registers new_values;
 
     //analog value
-    new_values.reserved_analog = analog_value;
+    new_values.reserved = 0;
 
 //Save data into new_values
     new_values.c1_mm = filteredResult_coll[0];
@@ -437,7 +437,8 @@ void loop() {
     new_data_lock.lock();
 // Block copy new values over the top of the old values
 // and then set the "new data" bit.
-    registers.flags = 1 && 0x01;
+    //registers.flags = 1 && 0x01;
+    registers.flags = registers.flags | 0x01;
     memcpy(&registers, &new_values, sizeof(Registers));
     new_data_lock.unlock();
 

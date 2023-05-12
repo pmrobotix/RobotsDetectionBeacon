@@ -524,6 +524,9 @@ void add_display_pmx() {
             //seuillage à 10cm pres
             int moyval10cm = round(d_mm / 100.0);
 
+            if (moyval10cm == 10) //de 950 à 1000 on garde l'arrondi sur 9 à l'affichage
+                moyval10cm = 9;
+
             matrix->setTextSize(1);
             matrix->setFont();
             matrix->setRotation(0);

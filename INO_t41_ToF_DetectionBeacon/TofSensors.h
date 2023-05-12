@@ -24,7 +24,8 @@ struct Settings {
 
 // Registers that the caller can only read
 struct Registers {
-    uint8_t flags = 0;        // Register 4. bit 0 => new data available
+    uint8_t flags = 0x80;        // Register 4. bit 0 => new data available
+                                            //bit 7 => alive=1
     //TODO FLAGS
     //overflow more than 3 beacons
     //more than 6 contigus
@@ -40,7 +41,7 @@ struct Registers {
     int16_t c7_mm = 0;        // Register 18.
     int16_t c8_mm = 0;        // Register 20.
 
-    int16_t reserved_analog = 0;        // Register 22.
+    int16_t reserved = 0;        // Register 22.
 
     int16_t x1_mm = 0;        // Register 24.
     int16_t y1_mm = 0;        // Register 26.
